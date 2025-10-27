@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/kik/Downloads/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/kik/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/kik/game_coding/overlap 게임 코딩/overlap/android/app/.cxx/RelWithDebInfo/3f2h6n36/armeabi-v7a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/kik/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/kik/game_coding/overlap 게임 코딩/overlap/android/app/.cxx/RelWithDebInfo/3f2h6n36/armeabi-v7a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

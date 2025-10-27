@@ -1,0 +1,2 @@
+/Users/kik/game_coding/overlap 게임 코딩/overlap/android/app/.cxx/RelWithDebInfo/3f2h6n36/x86_64/CMakeFiles/edit_cache.dir
+/Users/kik/game_coding/overlap 게임 코딩/overlap/android/app/.cxx/RelWithDebInfo/3f2h6n36/x86_64/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,1 @@
+enum Cellstate { empty, occupied }
