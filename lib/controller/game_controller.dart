@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:overlap/constants/game_constant.dart';
-import 'package:overlap/constants/level_data.dart';
 import 'package:overlap/controller/timer_controller.dart';
 import 'package:overlap/enum/bord_enum.dart';
 import 'package:overlap/models/game_state.dart';
@@ -26,19 +25,12 @@ class GameController extends GetxController {
 
   GlobalKey gridkey = GlobalKey();
   RxInt stage = 1.obs;
+
   RxDouble score = 0.0.obs;
 
   RxBool isGameOver = false.obs;
 
   RxBool isCountdownDone = false.obs;
-
-  LevelData? get _currentLevelConfig {
-    final index = stage.value - 1;
-    if (index < 0 || index >= kLevelData.length) {
-      return null;
-    }
-    return kLevelData[index];
-  }
 
   @override
   void onInit() {
@@ -60,22 +52,6 @@ class GameController extends GetxController {
 
   void generatePuzzle() {
     solveList.fillRange(0, solveList.length, Cellstate.empty);
-
-    final level = _currentLevelConfig;
-    if (level != null) {
-      for (int row = 0; row < level.map.length; row++) {
-        final rowLayout = level.map[row];
-        for (int col = 0; col < rowLayout.length; col++) {
-          final cell = rowLayout[col];
-          if (cell != '.' && cell != '0') {
-            final index = row * COL + col;
-            solveList[index] = Cellstate.occupied;
-          }
-        }
-      }
-      update();
-      return;
-    }
 
     _generateRandomPuzzle();
   }
@@ -221,16 +197,6 @@ class GameController extends GetxController {
 
     blocknames.clear();
     blockList.clear();
-    final level = _currentLevelConfig;
-    if (level != null) {
-      for (final blockKey in level.blockKeys) {
-        final blockShape = blockShapes[blockKey];
-        if (blockShape == null) continue;
-        blocknames.add(blockKey);
-        blockList.add(List<Offset>.from(blockShape));
-      }
-      return;
-    }
 
     final random = Random();
 
@@ -343,6 +309,7 @@ class GameController extends GetxController {
         savescore();
         timerController.reduceTime();
         stage.value += 1;
+
         resetBoard();
         undoStack.clear();
         applyNextBlockOverlay();
