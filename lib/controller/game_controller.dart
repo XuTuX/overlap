@@ -11,26 +11,28 @@ import 'package:get/get.dart';
 class GameController extends GetxController {
   final TimerController timerController = Get.put(TimerController());
   final HiveGameBox hiveGameBox = HiveGameBox();
+  final Random _random = Random();
 
   final RxList<Cellstate> boardList =
       RxList.generate(COL * ROW, (_) => Cellstate.empty);
-  RxList<Cellstate> solveList =
+  final RxList<Cellstate> solveList =
       RxList.generate(COL * ROW, (_) => Cellstate.empty);
 
-  RxList<List<Offset>> blockList = <List<Offset>>[].obs;
-  RxList<String> blocknames = <String>[].obs; // .obs를 사용해 RxList로 선언
+  final RxList<BlockState> availableBlocks = <BlockState>[].obs;
 
   final List<GameState> undoStack = [];
-  RxBool glowBoard = false.obs;
+  final RxBool glowBoard = false.obs;
 
-  GlobalKey gridkey = GlobalKey();
-  RxInt stage = 1.obs;
+  final GlobalKey gridKey = GlobalKey();
+  final RxInt stage = 1.obs;
 
-  RxDouble score = 0.0.obs;
+  final RxDouble score = 0.0.obs;
 
-  RxBool isGameOver = false.obs;
+  final RxBool isGameOver = false.obs;
 
-  RxBool isCountdownDone = false.obs;
+  final RxBool isCountdownDone = false.obs;
+
+  final RxBool shakeBoard = false.obs;
 
   @override
   void onInit() {
@@ -45,7 +47,7 @@ class GameController extends GetxController {
 
   void triggerBoardGlow() {
     glowBoard.value = true;
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       glowBoard.value = false;
     });
   }
@@ -57,16 +59,16 @@ class GameController extends GetxController {
   }
 
   void _generateRandomPuzzle() {
-    List<List<Offset>> selectedBlocks =
-        blockList.map((block) => List<Offset>.from(block)).toList();
+    final selectedBlocks =
+        availableBlocks.map((block) => block.copyWith()).toList();
 
-    for (List<Offset> block in selectedBlocks) {
-      Offset startPosition = Offset(
-        Random().nextInt(COL - 2) + 1.toDouble(), // 블록 크기에 따라 조정
-        Random().nextInt(ROW - 2) + 1.toDouble(),
+    for (final block in selectedBlocks) {
+      final startPosition = Offset(
+        _random.nextInt(COL - 2) + 1.0, // 블록 크기에 따라 조정
+        _random.nextInt(ROW - 2) + 1.0,
       );
 
-      List<Offset> rotatedBlock = randomRotateBlock(block);
+      final rotatedBlock = randomRotateBlock(block.offsets);
 
       toggleBlockOnSolve(
         rotatedBlock,
@@ -77,16 +79,25 @@ class GameController extends GetxController {
     update();
   }
 
+  bool _isWithinBoard(int col, int row) {
+    return row >= 0 && row < ROW && col >= 0 && col < COL;
+  }
+
+  void _toggleCell(RxList<Cellstate> target, int col, int row) {
+    if (!_isWithinBoard(col, row)) {
+      return;
+    }
+    final index = row * COL + col;
+    target[index] = target[index] == Cellstate.empty
+        ? Cellstate.occupied
+        : Cellstate.empty;
+  }
+
   void toggleBlockOnSolve(List<Offset> block, int col, int row) {
     for (var offset in block) {
-      int newcol = col + (offset.dx - CENTER_POINT).toInt();
-      int newrow = row + (offset.dy - CENTER_POINT).toInt();
-
-      int index = newrow * COL + newcol;
-
-      solveList[index] = solveList[index] == Cellstate.empty
-          ? Cellstate.occupied
-          : Cellstate.empty;
+      final targetCol = col + (offset.dx - CENTER_POINT).toInt();
+      final targetRow = row + (offset.dy - CENTER_POINT).toInt();
+      _toggleCell(solveList, targetCol, targetRow);
     }
     update();
   }
@@ -103,20 +114,19 @@ class GameController extends GetxController {
   void checkAndApplyNextBlock() {
     if (isSolutionMatched()) {
       undoStack.clear();
-      blockList.clear();
+      availableBlocks.clear();
       applyNextBlockOverlay();
     }
   }
 
   void applyNextBlockOverlay() {
-    blockList.clear();
-    blocknames.clear();
+    availableBlocks.clear();
     generateBlock();
     generatePuzzle();
   }
 
   List<Offset> randomRotateBlock(List<Offset> block) {
-    int angle = [0, 90, 180, 270][Random().nextInt(4)];
+    final angle = [0, 90, 180, 270][_random.nextInt(4)];
     if (angle == 0) return block;
 
     List<Offset> rotatedBlock = [];
@@ -148,17 +158,13 @@ class GameController extends GetxController {
   }
 
   void saveState() {
-    List<Cellstate> boardCopy = List<Cellstate>.from(boardList);
-
-    List<List<Offset>> blockListCopy =
-        blockList.map((block) => List<Offset>.from(block)).toList();
-
-    List<String> blockNamesCopy = List<String>.from(blocknames);
+    final boardCopy = List<Cellstate>.from(boardList);
+    final blocksCopy =
+        availableBlocks.map((block) => block.copyWith()).toList();
 
     undoStack.add(GameState(
       board: boardCopy,
-      blockList: blockListCopy,
-      blockNames: blockNamesCopy,
+      blocks: blocksCopy,
     ));
   }
 
@@ -169,20 +175,16 @@ class GameController extends GetxController {
       return;
     }
 
-    GameState previousState = undoStack.removeLast();
+    final previousState = undoStack.removeLast();
 
     for (int i = 0; i < boardList.length; i++) {
       boardList[i] = previousState.board[i];
     }
     boardList.refresh();
 
-    blockList.clear();
-    for (final block in previousState.blockList) {
-      blockList.add(List<Offset>.from(block));
-    }
-    blockList.refresh();
-
-    blocknames.assignAll(previousState.blockNames);
+    availableBlocks.assignAll(
+      previousState.blocks.map((block) => block.copyWith()).toList(),
+    );
   }
 
   void resetBoard() {
@@ -195,43 +197,34 @@ class GameController extends GetxController {
   void generateBlock() {
     if (isGameOver.value) return; // 게임 오버면 아무것도 하지 않음
 
-    blocknames.clear();
-    blockList.clear();
+    availableBlocks.clear();
 
-    final random = Random();
-
-    List<String> allBlockNames = blockShapes.keys.toList();
-    allBlockNames.shuffle(random);
-
+    final allBlockNames = blockShapes.keys.toList()..shuffle(_random);
     final count = min(BLOCK_LIST_COUNTS, allBlockNames.length);
-    for (int i = 0; i < count; i++) {
-      String blockName = allBlockNames[i];
-      blocknames.add(blockName);
-      blockList.add(List<Offset>.from(blockShapes[blockName]!));
+    for (var i = 0; i < count; i++) {
+      final blockName = allBlockNames[i];
+      final offsets = blockShapes[blockName]!;
+      availableBlocks.add(BlockState(name: blockName, offsets: offsets));
     }
   }
 
-  void insertAfterRemove(List<Offset> block, int col, int row) {
+  void insertAfterRemove(BlockState block, int col, int row) {
     saveState();
-    for (var offset in block) {
+    for (final offset in block.offsets) {
       final newcol = col + (offset.dx).toInt();
       final newrow = row + (offset.dy).toInt();
 
-      int index = newrow * COL + newcol;
-
-      boardList[index] = boardList[index] == Cellstate.empty
-          ? Cellstate.occupied
-          : Cellstate.empty;
+      _toggleCell(boardList, newcol, newrow);
     }
-    blockList.remove(block);
+    availableBlocks.remove(block);
   }
 
-  bool canplace(List<Offset> block, int col, int row) {
-    for (var offset in block) {
+  bool canPlace(BlockState block, int col, int row) {
+    for (final offset in block.offsets) {
       final newcol = col + (offset.dx).toInt();
       final newrow = row + (offset.dy).toInt();
 
-      if (newrow < 0 || newrow >= ROW || newcol < 0 || newcol >= COL) {
+      if (!_isWithinBoard(newcol, newrow)) {
         return false;
       }
     }
@@ -240,11 +233,11 @@ class GameController extends GetxController {
 
   void rotateBlock(int index) {
     if (isGameOver.value) return; // 게임 오버면 아무것도 하지 않음
-    List<Offset> originalBlock = blockList[index];
-    List<Offset> rotatedBlock = [];
+    final block = availableBlocks[index];
+    final rotatedBlock = <Offset>[];
 
     // 회전 연산 수행
-    for (var offset in originalBlock) {
+    for (final offset in block.offsets) {
       double x = offset.dx - CENTER_POINT;
       double y = offset.dy - CENTER_POINT;
 
@@ -256,15 +249,15 @@ class GameController extends GetxController {
     }
 
     // rotatedBlock 내의 y 좌표의 최솟값 구하기
-    double minY = rotatedBlock.map((o) => o.dy).reduce(min);
-    double minX = rotatedBlock.map((o) => o.dx).reduce(min);
+    final minY = rotatedBlock.map((o) => o.dy).reduce(min);
+    final minX = rotatedBlock.map((o) => o.dx).reduce(min);
 
     // 모든 Offset의 y값에서 minY를 빼서 최소 y가 0이 되도록 조정
-    rotatedBlock =
+    final normalizedBlock =
         rotatedBlock.map((o) => Offset(o.dx - minX, o.dy - minY)).toList();
 
-    blockList[index] = rotatedBlock;
-    blockList.refresh(); // GetX 상태 업데이트
+    availableBlocks[index] = block.copyWith(offsets: normalizedBlock);
+    availableBlocks.refresh(); // GetX 상태 업데이트
   }
 
   void resetGame() {
@@ -292,17 +285,15 @@ class GameController extends GetxController {
     hiveGameBox.setHighScore(score.value); // 최고 점수 저장
   }
 
-// GameController 안
-
-  void insert(List<Offset> block, int col, int row) {
+  void insert(BlockState block, int col, int row) {
     if (isGameOver.value) return; // 게임 오버면 아무것도 하지 않음
 
-    if (!canplace(block, col, row)) return;
+    if (!canPlace(block, col, row)) return;
 
     insertAfterRemove(block, col, row);
 
-    if (blockList.isEmpty) {
-      bool isMatched = isSolutionMatched();
+    if (availableBlocks.isEmpty) {
+      final isMatched = isSolutionMatched();
 
       if (isMatched) {
         triggerBoardGlow();
@@ -316,21 +307,19 @@ class GameController extends GetxController {
         timerController.startTimer(); // 타이머 재시작!
       } else {
         // 틀렸을 경우, 다른 처리
-        print("모든 블록을 놓았지만 정답이 아닙니다.");
+        debugPrint("모든 블록을 놓았지만 정답이 아닙니다.");
         triggerBoardShake();
-        Future.delayed(Duration(milliseconds: 200), () {
+        Future.delayed(const Duration(milliseconds: 200), () {
           undo();
         });
       }
     }
   }
 
-  RxBool shakeBoard = false.obs;
-
   void triggerBoardShake() {
     shakeBoard.value = true;
 
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       shakeBoard.value = false;
     });
   }

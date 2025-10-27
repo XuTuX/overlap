@@ -32,7 +32,7 @@ class GameBoard extends StatelessWidget {
             border: Border.all(color: boardColor, width: 5),
           ),
           child: GridView.builder(
-              key: gameController.gridkey,
+              key: gameController.gridKey,
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

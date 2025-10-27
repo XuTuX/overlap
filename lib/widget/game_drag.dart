@@ -15,28 +15,28 @@ class GameDrag extends StatelessWidget {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(gameController.blockList.length, (index) {
-          final block = gameController.blockList[index];
+        children: List.generate(gameController.availableBlocks.length, (index) {
+          final block = gameController.availableBlocks[index];
           return Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5.0),
                 child: Draggable(
-                  key: ValueKey(block), // 각 항목에 고유한 키 부여 (가능하면 고유한 값 사용)
-                  feedback: TetrisModel(blockList: block),
+                  key: ValueKey('${block.name}-$index'), // 각 항목에 고유한 키 부여
+                  feedback: TetrisModel(blockList: block.offsets),
                   childWhenDragging: Container(
                     width: BLOCK_BOX_SIZE,
                     height: BLOCK_BOX_SIZE,
                   ),
-                  child: TetrisModel(blockList: block),
+                  child: TetrisModel(blockList: block.offsets),
                   dragAnchorStrategy: (draggable, context, position) {
                     final offsetX = context.size!.width / 2;
                     final offsetY = context.size!.height + 27;
                     return Offset(offsetX, offsetY);
                   },
                   onDragEnd: (details) {
-                    RenderBox gridBox = gameController.gridkey.currentContext
+                    RenderBox gridBox = gameController.gridKey.currentContext
                         ?.findRenderObject() as RenderBox;
                     Offset gridPosition = gridBox.localToGlobal(Offset.zero);
 
