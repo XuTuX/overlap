@@ -258,6 +258,12 @@ class GameController extends GetxController {
     isGameOver.value = false;
     isCountdownDone.value = false;
     resetBoard();
+    // solveList도 비워주기
+    for (int i = 0; i < solveList.length; i++) {
+      solveList[i] = Cellstate.empty;
+    }
+    solveList.refresh();
+
     undoStack.clear();
     stage.value = 1;
     score.value = 0.0;

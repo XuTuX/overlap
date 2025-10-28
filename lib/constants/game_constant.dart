@@ -66,12 +66,6 @@ Map<String, List<Offset>> blockShapes = {
     Offset(1, 1),
     Offset(0, 1),
   ],
-  'I': [
-    Offset(0, 0),
-    Offset(1, 0),
-    Offset(2, 0),
-    Offset(3, 0),
-  ],
   'T': [
     Offset(0, 0),
     Offset(1, 0),
