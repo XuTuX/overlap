@@ -194,61 +194,93 @@ class _StageStatsRow extends StatelessWidget {
               ),
               child: Obx(() {
                 final moves = controller.currentMoves.value;
-                final minMoves = stage.minMoves;
+                final target = stage.minMoves;
+                final stars = moves == 0
+                    ? 0
+                    : controller.calculateStars(moves, target);
+                final int remaining = (target - moves).clamp(0, target);
+
+                String comparison;
+                if (moves == 0) {
+                  comparison = '목표까지 $target회 남음';
+                } else if (remaining > 0) {
+                  comparison = '목표까지 $remaining회 남음';
+                } else if (stars == 3) {
+                  comparison = '목표 배치를 완벽히 달성!';
+                } else if (stars == 2) {
+                  comparison = '목표보다 ${moves - target}회 초과';
+                } else {
+                  comparison = '목표보다 ${moves - target}회 많아요';
+                }
+
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '최소 배치',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.flag_rounded,
+                          color: AppColors.accent,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '목표 $target회',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '$minMoves회',
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Container(
-                          width: 3,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: AppColors.accent.withValues(alpha: 0.7),
-                            borderRadius: BorderRadius.circular(4),
+                        Icon(
+                          Icons.touch_app_rounded,
+                          color: AppColors.textSecondary,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '$moves회 사용',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              '현재 배치',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                            Text(
-                              '$moves회',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
                       ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: List.generate(3, (index) {
+                        final filled = index < stars;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 4.0),
+                          child: Icon(
+                            filled
+                                ? Icons.star_rounded
+                                : Icons.star_border_rounded,
+                            size: 18,
+                            color: filled
+                                ? const Color(0xFFFFC850)
+                                : AppColors.textSecondary
+                                    .withFraction(0.2),
+                          ),
+                        );
+                      }),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      comparison,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.accent,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 );

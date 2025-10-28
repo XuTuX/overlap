@@ -16,8 +16,8 @@ class ArcadeStageClearedOverlay extends StatelessWidget {
 
     final nextStage = _findNextStage(stage);
     final moves = controller.currentMoves.value;
-    final minMoves = stage.minMoves;
-    final stars = _calculateStars(minMoves, moves);
+    final targetMoves = stage.minMoves;
+    final stars = controller.calculateStars(moves, targetMoves);
 
     return Container(
       decoration: const BoxDecoration(
@@ -90,7 +90,7 @@ class ArcadeStageClearedOverlay extends StatelessWidget {
 
                         // 결과 요약
                         Text(
-                          '최소 배치 $minMoves회 · 사용 $moves회',
+                          '목표 $targetMoves회 · $moves회로 클리어',
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.85),
                             fontSize: 15,
@@ -124,13 +124,6 @@ class ArcadeStageClearedOverlay extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  int _calculateStars(int minMoves, int moves) {
-    final diff = moves - minMoves;
-    if (diff <= 0) return 3;
-    if (diff <= 2) return 2;
-    return 1;
   }
 
   StageData? _findNextStage(StageData current) {

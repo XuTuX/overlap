@@ -42,6 +42,9 @@ class _ArcadeMapScreenState extends State<ArcadeMapScreen> {
     final int clearedStage = hive.getClearedStage();
     final double progress =
         (clearedStage / arcadeStages.length).clamp(0.0, 1.0);
+    final Map<int, int> stageStars = hive.getStageStars();
+    final int totalStars = stageStars.values.fold(0, (p, c) => p + c);
+    final int maxStars = arcadeStages.length * 3;
 
     return Scaffold(
       appBar: AppBar(
@@ -69,6 +72,8 @@ class _ArcadeMapScreenState extends State<ArcadeMapScreen> {
                 child: _ProgressHeader(
                   clearedStage: clearedStage,
                   progress: progress,
+                  totalStars: totalStars,
+                  maxStars: maxStars,
                 ),
               ),
               const SizedBox(height: 12),
@@ -87,6 +92,7 @@ class _ArcadeMapScreenState extends State<ArcadeMapScreen> {
                     final bool isCleared = stageId <= clearedStage;
                     final bool isUnlocked = stageId <= clearedStage + 1;
                     final bool isSelected = index == _currentIndex;
+                    final int stars = stageStars[stageId] ?? 0;
 
                     return AnimatedScale(
                       duration: const Duration(milliseconds: 200),
@@ -95,6 +101,7 @@ class _ArcadeMapScreenState extends State<ArcadeMapScreen> {
                         stage: stage,
                         isCleared: isCleared,
                         isUnlocked: isUnlocked,
+                        stars: stars,
                         onPlay: () {
                           if (!isUnlocked) return;
                           controller.isStageCleared.value = false;
@@ -143,10 +150,14 @@ class _ArcadeMapScreenState extends State<ArcadeMapScreen> {
 class _ProgressHeader extends StatelessWidget {
   final int clearedStage;
   final double progress;
+  final int totalStars;
+  final int maxStars;
 
   const _ProgressHeader({
     required this.clearedStage,
     required this.progress,
+    required this.totalStars,
+    required this.maxStars,
   });
 
   @override
@@ -208,6 +219,28 @@ class _ProgressHeader extends StatelessWidget {
               fontSize: 13,
             ),
           ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              const Icon(Icons.star_rounded, color: Color(0xFFFFC850)),
+              const SizedBox(width: 6),
+              Text(
+                '$totalStars / $maxStars',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '획득한 별',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.6),
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -218,12 +251,14 @@ class _StagePreviewCard extends StatelessWidget {
   final StageData stage;
   final bool isCleared;
   final bool isUnlocked;
+  final int stars;
   final VoidCallback onPlay;
 
   const _StagePreviewCard({
     required this.stage,
     required this.isCleared,
     required this.isUnlocked,
+    required this.stars,
     required this.onPlay,
   });
 
@@ -271,28 +306,16 @@ class _StagePreviewCard extends StatelessWidget {
                   ),
                 ),
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  color: Colors.white.withValues(alpha: 0.16),
-                ),
-                child: Text(
-                  isCleared
-                      ? 'Cleared'
-                      : isUnlocked
-                          ? 'Ready'
-                          : 'Locked',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+                      _StageStateBadge(
+                        isCleared: isCleared,
+                        isUnlocked: isUnlocked,
+                        stars: stars,
+                      ),
             ],
           ),
           const SizedBox(height: 18),
+          _CompactStarRow(stars: stars),
+          const SizedBox(height: 12),
           Text(
             stage.title,
             style: const TextStyle(
@@ -304,7 +327,7 @@ class _StagePreviewCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '최소 ${stage.minMoves}번 배치 · 사용 블록 ${uniqueBlocks.length}종',
+            '목표 ${stage.minMoves}회 · 사용 블록 ${uniqueBlocks.length}종',
             style: const TextStyle(
               color: Colors.white70,
               fontSize: 13,
@@ -386,6 +409,86 @@ class _StagePreviewCard extends StatelessWidget {
       const Color(0xFF23283B),
       const Color(0xFF1A1F30),
     ];
+  }
+}
+
+class _StageStateBadge extends StatelessWidget {
+  final bool isCleared;
+  final bool isUnlocked;
+  final int stars;
+
+  const _StageStateBadge({
+    required this.isCleared,
+    required this.isUnlocked,
+    required this.stars,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    String label;
+    IconData icon;
+    Color background;
+
+    if (!isUnlocked) {
+      label = 'Locked';
+      icon = Icons.lock_rounded;
+      background = Colors.white.withValues(alpha: 0.12);
+    } else if (isCleared) {
+      label = '$stars / 3';
+      icon = Icons.star_rounded;
+      background = const Color(0xFFFFC850).withValues(alpha: 0.3);
+    } else {
+      label = 'Ready';
+      icon = Icons.play_arrow_rounded;
+      background = Colors.white.withValues(alpha: 0.16);
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: background,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: 16),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CompactStarRow extends StatelessWidget {
+  final int stars;
+  const _CompactStarRow({required this.stars});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(3, (i) {
+        final filled = i < stars;
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3),
+          child: Icon(
+            filled ? Icons.star_rounded : Icons.star_border_rounded,
+            size: 20,
+            color: filled
+                ? const Color(0xFFFFC850)
+                : Colors.white.withValues(alpha: 0.3),
+          ),
+        );
+      }),
+    );
   }
 }
 

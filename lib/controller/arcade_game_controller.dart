@@ -29,6 +29,16 @@ class ArcadeGameController extends GetxController {
   final RxInt currentMoves = 0.obs;
   final RxBool isStageCleared = false.obs;
 
+  int calculateStars(int moves, int target) {
+    if (moves <= target) {
+      return 3;
+    }
+    if (moves <= target * 2) {
+      return 2;
+    }
+    return 1;
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -213,19 +223,17 @@ class ArcadeGameController extends GetxController {
   void _handleStageCleared() async {
     if (isStageCleared.value) return;
 
-    // 1️⃣ 보드 반짝 효과 (0.6초)
     triggerBoardGlow();
 
-    // 2️⃣ 클리어 상태로 기록
     final stage = currentStage.value;
     if (stage != null) {
       hiveGameBox.setClearedStage(stage.id);
+      final int moves = currentMoves.value;
+      final int stars = calculateStars(moves, stage.minMoves);
+      hiveGameBox.setStageStar(stage.id, stars);
     }
 
-    // 3️⃣ 약간의 여운 후 클리어 창 띄우기 (1.2초 뒤)
     await Future.delayed(const Duration(milliseconds: 700));
-
-    // 4️⃣ 이제 클리어 오버레이 표시
     isStageCleared.value = true;
   }
 }
