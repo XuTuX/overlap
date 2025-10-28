@@ -21,8 +21,8 @@ class Gameover extends StatelessWidget {
             letterSpacing: 1.2,
           ),
         ),
-        SizedBox(
-          height: 5, // .h 제거
+        const SizedBox(
+          height: 5,
         ),
         Row(
           children: [
@@ -35,7 +35,7 @@ class Gameover extends StatelessWidget {
               ),
             ),
             IconButton(
-              onPressed: () => gameController.resetGame(),
+              onPressed: gameController.resetGame,
               icon: Icon(
                 Icons.replay_rounded,
                 size: ResponsiveSizes.gameOverIconSize(),

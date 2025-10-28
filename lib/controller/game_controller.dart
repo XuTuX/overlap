@@ -1,12 +1,12 @@
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:overlap/constants/game_constant.dart';
 import 'package:overlap/controller/timer_controller.dart';
 import 'package:overlap/enum/bord_enum.dart';
 import 'package:overlap/models/game_state.dart';
 import 'package:overlap/models/hive_game_box.dart';
-
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class GameController extends GetxController {
   final TimerController timerController = Get.put(TimerController());
@@ -62,7 +62,7 @@ class GameController extends GetxController {
 
     for (final block in selectedBlocks) {
       final startPosition = Offset(
-        _random.nextInt(COL - 2) + 1.0, // 블록 크기에 따라 조정
+        _random.nextInt(COL - 2) + 1.0,
         _random.nextInt(ROW - 2) + 1.0,
       );
 
@@ -149,7 +149,7 @@ class GameController extends GetxController {
   }
 
   void savescore() {
-    if (isGameOver.value) return; // 게임 오버면 아무것도 하지 않음
+    if (isGameOver.value) return;
     double newScore = score.value + timerController.remainingTime.value;
     score.value = double.parse(newScore.toStringAsFixed(1));
   }
@@ -166,7 +166,7 @@ class GameController extends GetxController {
   }
 
   void undo() {
-    if (isGameOver.value) return; // 게임 오버면 아무것도 하지 않음{
+    if (isGameOver.value) return;
 
     if (undoStack.isEmpty) {
       return;
@@ -192,7 +192,7 @@ class GameController extends GetxController {
   }
 
   void generateBlock() {
-    if (isGameOver.value) return; // 게임 오버면 아무것도 하지 않음
+    if (isGameOver.value) return;
 
     availableBlocks.clear();
 
@@ -229,11 +229,10 @@ class GameController extends GetxController {
   }
 
   void rotateBlock(int index) {
-    if (isGameOver.value) return; // 게임 오버면 아무것도 하지 않음
+    if (isGameOver.value) return;
     final block = availableBlocks[index];
     final rotatedBlock = <Offset>[];
 
-    // 회전 연산 수행
     for (final offset in block.offsets) {
       double x = offset.dx - CENTER_POINT;
       double y = offset.dy - CENTER_POINT;
@@ -245,45 +244,35 @@ class GameController extends GetxController {
           .add(Offset(rotatedX + CENTER_POINT, rotatedY + CENTER_POINT));
     }
 
-    // rotatedBlock 내의 y 좌표의 최솟값 구하기
     final minY = rotatedBlock.map((o) => o.dy).reduce(min);
     final minX = rotatedBlock.map((o) => o.dx).reduce(min);
 
-    // 모든 Offset의 y값에서 minY를 빼서 최소 y가 0이 되도록 조정
     final normalizedBlock =
         rotatedBlock.map((o) => Offset(o.dx - minX, o.dy - minY)).toList();
 
     availableBlocks[index] = block.copyWith(offsets: normalizedBlock);
-    availableBlocks.refresh(); // GetX 상태 업데이트
+    availableBlocks.refresh();
   }
 
   void resetGame() {
-    // 7) 게임 오버 상태 초기화
     isGameOver.value = false;
     isCountdownDone.value = false;
-    // 1) 보드 초기화
     resetBoard();
     undoStack.clear();
     stage.value = 1;
-
-    // 2) 점수 초기화
     score.value = 0.0;
-    // 3) 타이머 초기화
     timerController.resetTimer();
-
-    // 4) 스테이지 설정
     applyNextBlockOverlay();
-
     startCountdown();
   }
 
   void gameover() {
     isGameOver.value = true;
-    hiveGameBox.setHighScore(score.value); // 최고 점수 저장
+    hiveGameBox.setHighScore(score.value);
   }
 
   void insert(BlockState block, int col, int row) {
-    if (isGameOver.value) return; // 게임 오버면 아무것도 하지 않음
+    if (isGameOver.value) return;
 
     if (!canPlace(block, col, row)) return;
 
@@ -300,9 +289,8 @@ class GameController extends GetxController {
 
         undoStack.clear();
         applyNextBlockOverlay();
-        timerController.startTimer(); // 타이머 재시작!
+        timerController.startTimer();
       } else {
-        // 틀렸을 경우, 다른 처리
         debugPrint("모든 블록을 놓았지만 정답이 아닙니다.");
         triggerBoardShake();
         Future.delayed(const Duration(milliseconds: 200), () {

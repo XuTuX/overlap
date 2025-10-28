@@ -11,7 +11,7 @@ class GameBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    GameController gameController = Get.put(GameController());
+    GameController gameController = Get.find<GameController>();
     return Center(
       child: Obx(() {
         Color boardColor;

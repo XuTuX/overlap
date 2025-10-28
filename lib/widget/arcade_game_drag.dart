@@ -1,17 +1,16 @@
-import 'package:overlap/constants/app_colors.dart';
-import 'package:overlap/constants/game_constant.dart';
-import 'package:overlap/models/tetris_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:overlap/constants/app_colors.dart';
+import 'package:overlap/constants/game_constant.dart';
+import 'package:overlap/controller/arcade_game_controller.dart';
+import 'package:overlap/models/tetris_model.dart';
 
-import '../controller/game_controller.dart';
-
-class GameDrag extends StatelessWidget {
-  const GameDrag({super.key});
+class ArcadeGameDrag extends StatelessWidget {
+  const ArcadeGameDrag({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final GameController gameController = Get.find<GameController>();
+    final ArcadeGameController gameController = Get.find<ArcadeGameController>();
     return Obx(() {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,7 +23,7 @@ class GameDrag extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5.0),
                 child: Draggable(
-                  key: ValueKey('${block.name}-$index'), // 각 항목에 고유한 키 부여
+                  key: ValueKey('${block.name}-$index'),
                   feedback: TetrisModel(blockList: block.offsets),
                   childWhenDragging: SizedBox(
                     width: BLOCK_BOX_SIZE,
@@ -41,8 +40,8 @@ class GameDrag extends StatelessWidget {
                         gameController.gridKey.currentContext?.findRenderObject();
                     if (renderObject is! RenderBox) return;
                     final gridBox = renderObject;
-                    final gridPosition = gridBox.localToGlobal(Offset.zero);
 
+                    final gridPosition = gridBox.localToGlobal(Offset.zero);
                     final dragPosition = details.offset;
 
                     final col = ((dragPosition.dx -

@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:overlap/constants/app_colors.dart';
 import 'package:overlap/constants/game_constant.dart';
 import 'package:overlap/controller/game_controller.dart';
@@ -9,23 +11,20 @@ import 'package:overlap/widget/game_over.dart';
 import 'package:overlap/widget/score_widget.dart';
 import 'package:overlap/widget/solve_board.dart';
 import 'package:overlap/widget/timer.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class GameScreen extends StatelessWidget {
   const GameScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final GameController gameController = Get.put(GameController());
+    final GameController gameController = Get.find<GameController>();
     final HiveGameBox hiveGameBox = HiveGameBox();
 
-    // 시작하자마자 카운트다운 시작
     Future.microtask(() => gameController.startCountdown());
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
               AppColors.background,
@@ -38,14 +37,14 @@ class GameScreen extends StatelessWidget {
         child: SafeArea(
           child: Obx(() {
             if (!gameController.isCountdownDone.value) {
-              return CountdownOverlay();
+              return const CountdownOverlay();
             }
 
             return Column(
               children: [
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 Obx(() {
-                  double highScore = hiveGameBox.getHighScore();
+                  final double highScore = hiveGameBox.getHighScore();
                   return ScoreWidget(
                     score: gameController.score.toString(),
                     highScore: highScore.toString(),
@@ -56,8 +55,8 @@ class GameScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Container(
-                      margin: EdgeInsets.all(10),
-                      padding: EdgeInsets.all(10),
+                      margin: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(24),
                         color: AppColors.surface.withFraction(0.8),
@@ -68,7 +67,7 @@ class GameScreen extends StatelessWidget {
                           BoxShadow(
                             color: Colors.black.withFraction(0.25),
                             blurRadius: 18,
-                            offset: Offset(0, 6),
+                            offset: const Offset(0, 6),
                           ),
                         ],
                       ),
@@ -76,17 +75,17 @@ class GameScreen extends StatelessWidget {
                         return Column(
                           children: [
                             gameController.isGameOver.value
-                                ? Gameover()
+                                ? const Gameover()
                                 : CircularTimer(),
                           ],
                         );
                       }),
                     ),
-                    SolveBoard(),
+                    const SolveBoard(),
                   ],
                 ),
                 SizedBox(height: CELL_HEIGHT),
-                GameBoard(),
+                const GameBoard(),
                 SizedBox(height: CELL_HEIGHT),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -94,24 +93,28 @@ class GameScreen extends StatelessWidget {
                     children: [
                       const Expanded(
                         child: Divider(
-                            thickness: 3, color: AppColors.divider),
+                          thickness: 3,
+                          color: AppColors.divider,
+                        ),
                       ),
                       IconButton(
                         onPressed: gameController.undo,
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.restore_rounded,
                           color: AppColors.textSecondary,
                         ),
                       ),
                       const Expanded(
                         child: Divider(
-                            thickness: 3, color: AppColors.divider),
+                          thickness: 3,
+                          color: AppColors.divider,
+                        ),
                       ),
                     ],
                   ),
                 ),
                 SizedBox(height: CELL_HEIGHT * 2),
-                GameDrag(),
+                const GameDrag(),
               ],
             );
           }),

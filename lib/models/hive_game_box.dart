@@ -17,6 +17,17 @@ class HiveGameBox {
     }
   }
 
+  int getClearedStage() {
+    return _box.get('clearedStage', defaultValue: 0) as int;
+  }
+
+  void setClearedStage(int stageId) {
+    final current = getClearedStage();
+    if (stageId > current) {
+      _box.put('clearedStage', stageId);
+    }
+  }
+
   // 튜토리얼 완료 여부 불러오기 (기본값 false)
   bool isTutorialCompleted() =>
       _box.get('tutorialCompleted', defaultValue: false);

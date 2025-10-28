@@ -10,7 +10,7 @@ class SolveBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    GameController solveController = Get.put(GameController());
+    GameController solveController = Get.find<GameController>();
     return Center(
       child: Column(
         children: [

@@ -6,16 +6,16 @@ import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 class TimerController extends GetxController {
   final CountDownController countdownController = CountDownController();
 
-  RxInt duration = 60.obs; // 타이머 시간 (초)
+  RxInt duration = 60.obs;
 
   final RxDouble remainingTime = 60.0.obs;
-  final RxInt restartCounter = 0.obs; // 타이머 재시작 시마다 값이 바뀌는 변수
+  final RxInt restartCounter = 0.obs;
 
   @override
   void onInit() {
     super.onInit();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      startTimer(); // 최초 시작
+      startTimer();
     });
   }
 
@@ -26,13 +26,13 @@ class TimerController extends GetxController {
   }
 
   void startTimer() {
-    restartCounter.value++; // 재시작할 때마다 값 변경
+    restartCounter.value++;
     remainingTime.value = duration.toDouble();
     countdownController.restart();
   }
 
   void resetTimer() {
-    duration.value = 60; // 무조건 60초로 초기화
+    duration.value = 60;
     startTimer();
   }
 }

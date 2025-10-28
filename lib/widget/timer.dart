@@ -7,8 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CircularTimer extends StatelessWidget {
-  final TimerController timerController = Get.put(TimerController());
-  final GameController gameController = Get.put(GameController());
+  CircularTimer({super.key});
+
+  final TimerController timerController = Get.find<TimerController>();
+  final GameController gameController = Get.find<GameController>();
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +50,7 @@ class CircularTimer extends StatelessWidget {
                                   : AppColors.accent)
                               .withFraction(0.45),
                           blurRadius: 18,
-                          offset: Offset(0, 6),
+                          offset: const Offset(0, 6),
                         ),
                       ],
                     ),
@@ -77,7 +79,7 @@ class CircularTimer extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    seconds.toStringAsFixed(1), // 0.1초 단위로 표시
+                    seconds.toStringAsFixed(1),
                     style: const TextStyle(
                       fontSize: 24.0,
                       color: AppColors.textPrimary,

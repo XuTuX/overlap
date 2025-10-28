@@ -1,14 +1,18 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:overlap/constants/app_colors.dart';
+import 'package:overlap/controller/arcade_game_controller.dart';
+import 'package:overlap/controller/game_controller.dart';
 import 'package:overlap/models/hive_game_box.dart';
+import 'package:overlap/screen/arcade_game_screen.dart';
+import 'package:overlap/screen/arcade_map_screen.dart';
 import 'package:overlap/screen/game_screen.dart';
 import 'package:overlap/screen/home_screen.dart';
 import 'package:overlap/screen/login_screen.dart';
 import 'package:overlap/screen/tutorial_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:get/route_manager.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -84,10 +88,22 @@ class MyApp extends StatelessWidget {
         ),
       ),
       initialRoute: initialRoute,
+      initialBinding: BindingsBuilder(() {
+        Get.put(GameController(), permanent: true);
+        Get.put(ArcadeGameController(), permanent: true);
+      }),
       getPages: [
         GetPage(
           name: '/game',
           page: () => GameScreen(),
+        ),
+        GetPage(
+          name: '/arcade',
+          page: () => ArcadeMapScreen(),
+        ),
+        GetPage(
+          name: '/arcade/game',
+          page: () => ArcadeGameScreen(),
         ),
         GetPage(
           name: '/home',
