@@ -27,7 +27,10 @@ class Gameover extends StatelessWidget {
         Row(
           children: [
             IconButton(
-              onPressed: () => Get.offAllNamed('/home'),
+              onPressed: () {
+                Get.delete<GameController>();
+                Get.offAllNamed('/home');
+              },
               icon: Icon(
                 Icons.home_rounded,
                 size: ResponsiveSizes.gameOverIconSize(),

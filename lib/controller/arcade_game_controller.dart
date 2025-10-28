@@ -210,13 +210,22 @@ class ArcadeGameController extends GetxController {
     loadStage(stage);
   }
 
-  void _handleStageCleared() {
+  void _handleStageCleared() async {
     if (isStageCleared.value) return;
+
+    // 1️⃣ 보드 반짝 효과 (0.6초)
     triggerBoardGlow();
-    isStageCleared.value = true;
+
+    // 2️⃣ 클리어 상태로 기록
     final stage = currentStage.value;
     if (stage != null) {
       hiveGameBox.setClearedStage(stage.id);
     }
+
+    // 3️⃣ 약간의 여운 후 클리어 창 띄우기 (1.2초 뒤)
+    await Future.delayed(const Duration(milliseconds: 700));
+
+    // 4️⃣ 이제 클리어 오버레이 표시
+    isStageCleared.value = true;
   }
 }
