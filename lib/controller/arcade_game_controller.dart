@@ -59,7 +59,7 @@ class ArcadeGameController extends GetxController {
     solveList.refresh();
 
     final blocks = <BlockState>[];
-    for (final name in stage.blockNames) {
+    for (final name in stage.blockNames.toSet()) {
       final shape = blockShapes[name];
       if (shape == null) {
         debugPrint('Unknown block name: $name');
@@ -197,18 +197,10 @@ class ArcadeGameController extends GetxController {
       _toggleCell(boardList, newcol, newrow);
     }
     boardList.refresh();
-    availableBlocks.remove(block);
     currentMoves.value += 1;
 
-    if (availableBlocks.isEmpty) {
-      if (isSolutionMatched()) {
-        _handleStageCleared();
-      } else {
-        triggerBoardShake();
-        Future.delayed(const Duration(milliseconds: 200), () {
-          undo();
-        });
-      }
+    if (isSolutionMatched()) {
+      _handleStageCleared();
     }
   }
 
@@ -219,6 +211,7 @@ class ArcadeGameController extends GetxController {
   }
 
   void _handleStageCleared() {
+    if (isStageCleared.value) return;
     triggerBoardGlow();
     isStageCleared.value = true;
     final stage = currentStage.value;

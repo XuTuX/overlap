@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:overlap/constants/app_colors.dart';
@@ -43,7 +41,6 @@ class ArcadeGameScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 24),
-                    _StageHeader(stage: stage),
                     SizedBox(height: CELL_HEIGHT),
                     _StageStatsRow(stage: stage),
                     SizedBox(height: CELL_HEIGHT),
@@ -123,39 +120,6 @@ class ArcadeGameScreen extends StatelessWidget {
   }
 }
 
-class _StageHeader extends StatelessWidget {
-  final StageData stage;
-
-  const _StageHeader({required this.stage});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          stage.title,
-          style: TextStyle(
-            fontSize: ResponsiveSizes.mainTextSize(),
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.4,
-            color: AppColors.textPrimary,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '최소 ${stage.minMoves}회 배치',
-          style: const TextStyle(
-            fontSize: 16,
-            color: AppColors.textSecondary,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _StageStatsRow extends StatelessWidget {
   final StageData stage;
 
@@ -173,7 +137,7 @@ class _StageStatsRow extends StatelessWidget {
           Expanded(
             child: Container(
               margin: const EdgeInsets.only(right: 12),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(24),
                 color: AppColors.surface.withFraction(0.82),
@@ -182,8 +146,8 @@ class _StageStatsRow extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withFraction(0.22),
-                    blurRadius: 18,
+                    color: Colors.black.withFraction(0.18),
+                    blurRadius: 16,
                     offset: const Offset(0, 6),
                   ),
                 ],
@@ -191,52 +155,60 @@ class _StageStatsRow extends StatelessWidget {
               child: Obx(() {
                 final moves = controller.currentMoves.value;
                 final minMoves = stage.minMoves;
-                final comparison = moves == 0
-                    ? '시작해볼까요?'
-                    : moves <= minMoves
-                        ? '최소 배치 달성!'
-                        : '+${moves - minMoves}회 초과';
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      '현재 배치',
-                      style: TextStyle(
-                        fontSize: 16,
+                    Text(
+                      '최소 배치',
+                      style: const TextStyle(
+                        fontSize: 15,
                         color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
+                    Text(
+                      '$minMoves회',
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          moves.toString(),
-                          style: TextStyle(
-                            fontSize: max(32.0, ResponsiveSizes.scoreTextSize()),
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                        Container(
+                          width: 3,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: AppColors.accent.withOpacity(0.7),
+                            borderRadius: BorderRadius.circular(4),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Text(
-                          '/ $minMoves',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textSecondary,
-                          ),
+                        const SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              '현재 배치',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            Text(
+                              '$moves회',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      comparison,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.accent,
-                        fontWeight: FontWeight.w600,
-                      ),
                     ),
                   ],
                 );

@@ -233,6 +233,7 @@ class _StagePreviewCard extends StatelessWidget {
     final Color chipColor = isUnlocked
         ? Colors.white.withValues(alpha: 0.28)
         : Colors.white.withValues(alpha: 0.14);
+    final Iterable<String> uniqueBlocks = stage.blockNames.toSet();
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
@@ -303,7 +304,7 @@ class _StagePreviewCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '최소 ${stage.minMoves}번 배치 · 블록 ${stage.blockNames.length}개',
+            '최소 ${stage.minMoves}번 배치 · 사용 블록 ${uniqueBlocks.length}종',
             style: const TextStyle(
               color: Colors.white70,
               fontSize: 13,
@@ -321,8 +322,7 @@ class _StagePreviewCard extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: stage.blockNames
-                .toSet()
+            children: uniqueBlocks
                 .map(
                   (block) => Container(
                     padding: const EdgeInsets.symmetric(

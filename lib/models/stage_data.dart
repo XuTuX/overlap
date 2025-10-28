@@ -33,7 +33,7 @@ final List<StageData> arcadeStages = [
     id: 1,
     title: 'Stage 1: Spark',
     minMoves: 3,
-    blockNames: ['O', 'I', 'T'],
+    blockNames: ['O', 'T'],
     solutionPattern: [
       [0, 1, 1, 1, 0],
       [0, 1, 1, 1, 0],
@@ -59,7 +59,7 @@ final List<StageData> arcadeStages = [
     id: 3,
     title: 'Stage 3: Arrow',
     minMoves: 4,
-    blockNames: ['I', 'T', 'L', 'J'],
+    blockNames: ['T', 'L', 'J'],
     solutionPattern: [
       [0, 1, 0, 1, 0],
       [0, 1, 1, 1, 0],
@@ -85,7 +85,7 @@ final List<StageData> arcadeStages = [
     id: 5,
     title: 'Stage 5: Pulse',
     minMoves: 5,
-    blockNames: ['T', 'O', 'I', 'S', 'Z'],
+    blockNames: ['T', 'O', 'S', 'Z'],
     solutionPattern: [
       [0, 1, 1, 1, 0],
       [1, 1, 1, 1, 1],
@@ -98,7 +98,7 @@ final List<StageData> arcadeStages = [
     id: 6,
     title: 'Stage 6: Fork',
     minMoves: 5,
-    blockNames: ['T', 'L', 'J', 'O', 'I'],
+    blockNames: ['T', 'L', 'J', 'O'],
     solutionPattern: [
       [0, 1, 0, 1, 0],
       [1, 1, 1, 1, 1],
@@ -137,7 +137,7 @@ final List<StageData> arcadeStages = [
     id: 9,
     title: 'Stage 9: Gateway',
     minMoves: 6,
-    blockNames: ['I', 'L', 'J', 'T', 'O', 'S'],
+    blockNames: ['L', 'J', 'T', 'O', 'S'],
     solutionPattern: [
       [1, 1, 0, 1, 1],
       [1, 1, 0, 1, 1],
@@ -163,7 +163,7 @@ final List<StageData> arcadeStages = [
     id: 11,
     title: 'Stage 11: Twin',
     minMoves: 7,
-    blockNames: ['O', 'T', 'I', 'S', 'Z', 'L', 'J'],
+    blockNames: ['O', 'T', 'S', 'Z', 'L', 'J'],
     solutionPattern: [
       [1, 0, 0, 0, 1],
       [1, 1, 0, 1, 1],
@@ -176,7 +176,7 @@ final List<StageData> arcadeStages = [
     id: 12,
     title: 'Stage 12: Comet',
     minMoves: 7,
-    blockNames: ['I', 'S', 'Z', 'T', 'L', 'J', 'O'],
+    blockNames: ['S', 'Z', 'T', 'L', 'J', 'O'],
     solutionPattern: [
       [0, 0, 1, 0, 0],
       [0, 1, 1, 1, 0],
@@ -189,7 +189,7 @@ final List<StageData> arcadeStages = [
     id: 13,
     title: 'Stage 13: Prism',
     minMoves: 7,
-    blockNames: ['T', 'O', 'I', 'L', 'J', 'S', 'Z'],
+    blockNames: ['T', 'O', 'L', 'J', 'S', 'Z'],
     solutionPattern: [
       [0, 1, 1, 1, 0],
       [1, 1, 0, 1, 1],
@@ -202,7 +202,7 @@ final List<StageData> arcadeStages = [
     id: 14,
     title: 'Stage 14: Labyrinth',
     minMoves: 8,
-    blockNames: ['L', 'J', 'T', 'S', 'Z', 'O', 'I'],
+    blockNames: ['L', 'J', 'T', 'S', 'Z', 'O'],
     solutionPattern: [
       [1, 1, 1, 1, 1],
       [1, 0, 0, 0, 1],
@@ -215,7 +215,7 @@ final List<StageData> arcadeStages = [
     id: 15,
     title: 'Stage 15: Crown',
     minMoves: 8,
-    blockNames: ['T', 'T', 'L', 'J', 'O', 'S', 'Z', 'I'],
+    blockNames: ['T', 'L', 'J', 'O', 'S', 'Z'],
     solutionPattern: [
       [0, 1, 0, 1, 0],
       [1, 1, 1, 1, 1],
@@ -228,7 +228,7 @@ final List<StageData> arcadeStages = [
     id: 16,
     title: 'Stage 16: Nebula',
     minMoves: 8,
-    blockNames: ['I', 'I', 'T', 'S', 'Z', 'L', 'J', 'O'],
+    blockNames: ['T', 'S', 'Z', 'L', 'J', 'O'],
     solutionPattern: [
       [1, 1, 1, 1, 1],
       [1, 1, 0, 1, 1],
@@ -241,7 +241,7 @@ final List<StageData> arcadeStages = [
     id: 17,
     title: 'Stage 17: Hive',
     minMoves: 9,
-    blockNames: ['O', 'O', 'L', 'J', 'T', 'S', 'Z', 'I', 'I'],
+    blockNames: ['O', 'L', 'J', 'T', 'S', 'Z'],
     solutionPattern: [
       [0, 1, 1, 1, 0],
       [1, 1, 0, 1, 1],
@@ -254,7 +254,7 @@ final List<StageData> arcadeStages = [
     id: 18,
     title: 'Stage 18: Vortex',
     minMoves: 9,
-    blockNames: ['L', 'J', 'S', 'Z', 'T', 'T', 'O', 'I', 'I'],
+    blockNames: ['L', 'J', 'S', 'Z', 'T', 'O'],
     solutionPattern: [
       [1, 1, 1, 1, 1],
       [1, 0, 0, 0, 1],
@@ -267,7 +267,7 @@ final List<StageData> arcadeStages = [
     id: 19,
     title: 'Stage 19: Halo',
     minMoves: 9,
-    blockNames: ['I', 'I', 'T', 'T', 'L', 'J', 'O', 'S', 'Z'],
+    blockNames: ['T', 'L', 'J', 'O', 'S', 'Z'],
     solutionPattern: [
       [0, 1, 1, 1, 0],
       [1, 1, 0, 1, 1],
@@ -280,7 +280,7 @@ final List<StageData> arcadeStages = [
     id: 20,
     title: 'Stage 20: Heartcore',
     minMoves: 10,
-    blockNames: ['O', 'O', 'T', 'T', 'L', 'J', 'S', 'Z', 'I', 'I'],
+    blockNames: ['O', 'T', 'L', 'J', 'S', 'Z'],
     solutionPattern: [
       [0, 1, 1, 1, 0],
       [1, 1, 1, 1, 1],
