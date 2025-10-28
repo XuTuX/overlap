@@ -169,7 +169,7 @@ class _StageStatsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final ArcadeGameController controller = Get.find<ArcadeGameController>();
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      padding: const EdgeInsets.symmetric(horizontal: 30.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,23 +195,6 @@ class _StageStatsRow extends StatelessWidget {
               child: Obx(() {
                 final moves = controller.currentMoves.value;
                 final target = stage.minMoves;
-                final stars = moves == 0
-                    ? 0
-                    : controller.calculateStars(moves, target);
-                final int remaining = (target - moves).clamp(0, target);
-
-                String comparison;
-                if (moves == 0) {
-                  comparison = '목표까지 $target회 남음';
-                } else if (remaining > 0) {
-                  comparison = '목표까지 $remaining회 남음';
-                } else if (stars == 3) {
-                  comparison = '목표 배치를 완벽히 달성!';
-                } else if (stars == 2) {
-                  comparison = '목표보다 ${moves - target}회 초과';
-                } else {
-                  comparison = '목표보다 ${moves - target}회 많아요';
-                }
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,34 +236,6 @@ class _StageStatsRow extends StatelessWidget {
                           ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: List.generate(3, (index) {
-                        final filled = index < stars;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 4.0),
-                          child: Icon(
-                            filled
-                                ? Icons.star_rounded
-                                : Icons.star_border_rounded,
-                            size: 18,
-                            color: filled
-                                ? const Color(0xFFFFC850)
-                                : AppColors.textSecondary
-                                    .withFraction(0.2),
-                          ),
-                        );
-                      }),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      comparison,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: AppColors.accent,
-                        fontWeight: FontWeight.w600,
-                      ),
                     ),
                   ],
                 );
