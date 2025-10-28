@@ -1,3 +1,4 @@
+import 'package:overlap/constants/app_colors.dart';
 import 'package:overlap/models/hive_game_box.dart';
 import 'package:overlap/screen/game_screen.dart';
 import 'package:overlap/screen/home_screen.dart';
@@ -46,21 +47,42 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'overlap',
       theme: ThemeData(
-          appBarTheme: AppBarTheme(
-            backgroundColor: Color(0xF1F0E8), // AppBar 배경색 일치
-            elevation: 0, // 그림자 없애서 더 깔끔하게
-            iconTheme: IconThemeData(color: Colors.black), // 아이콘 컬러 설정 (필요시)
-            titleTextStyle: GoogleFonts.poppins(
-              color: Colors.black,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: AppColors.background,
+        canvasColor: AppColors.surface,
+        appBarTheme: AppBarTheme(
+          backgroundColor: AppColors.background,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: AppColors.textPrimary),
+          titleTextStyle: GoogleFonts.poppins(
+            color: AppColors.textPrimary,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.4,
           ),
-          textTheme: GoogleFonts.poppinsTextTheme(), // 여기서 notoSans로 통일
-          primarySwatch: Colors.blue,
-          scaffoldBackgroundColor: Color(0xFFF7F1E0), // 부드러운 크림 톤 (따뜻하고 편안한 느낌)
-          colorScheme:
-              ColorScheme.fromSwatch().copyWith(secondary: Colors.amber)),
+        ),
+        textTheme: GoogleFonts.poppinsTextTheme().apply(
+          bodyColor: AppColors.textPrimary,
+          displayColor: AppColors.textPrimary,
+        ),
+        dividerColor: AppColors.divider,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.accent,
+          brightness: Brightness.dark,
+          primary: AppColors.accent,
+          secondary: AppColors.accentSecondary,
+          tertiary: AppColors.accentTertiary,
+          surface: AppColors.surface,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: AppColors.textPrimary,
+            backgroundColor: AppColors.surfaceAlt,
+            shape: const StadiumBorder(),
+            textStyle: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+        ),
+      ),
       initialRoute: initialRoute,
       getPages: [
         GetPage(

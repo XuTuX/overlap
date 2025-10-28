@@ -1,3 +1,4 @@
+import 'package:overlap/constants/app_colors.dart';
 import 'package:overlap/constants/game_constant.dart';
 import 'package:overlap/controller/game_controller.dart';
 import 'package:overlap/enum/bord_enum.dart';
@@ -15,11 +16,11 @@ class GameBoard extends StatelessWidget {
       child: Obx(() {
         Color boardColor;
         if (gameController.shakeBoard.value) {
-          boardColor = Colors.red;
+          boardColor = AppColors.accentTertiary;
         } else {
           boardColor = gameController.glowBoard.value
-              ? Colors.yellow
-              : Colors.grey[300]!;
+              ? AppColors.accent
+              : AppColors.textSecondary.withFraction(0.4);
         }
         return AnimatedContainer(
           duration: Duration(seconds: 1),
@@ -28,8 +29,20 @@ class GameBoard extends StatelessWidget {
           width: (BOARD_SIZE * 1.1),
           padding: EdgeInsets.all(5),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              colors: AppColors.boardGradient,
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
             border: Border.all(color: boardColor, width: 5),
+            boxShadow: [
+              BoxShadow(
+                color: boardColor.withFraction(0.35),
+                blurRadius: 20,
+                spreadRadius: 2,
+              ),
+            ],
           ),
           child: GridView.builder(
               key: gameController.gridKey,
@@ -40,20 +53,37 @@ class GameBoard extends StatelessWidget {
               itemCount: COL * ROW,
               itemBuilder: (context, index) {
                 return Obx(() {
+                  final isOccupied =
+                      gameController.boardList[index] == Cellstate.occupied;
                   return AnimatedContainer(
                     duration: Duration(milliseconds: 200),
                     curve: Curves.easeOut,
                     width: BOARD_CELL_SIZE,
                     height: BOARD_CELL_SIZE,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: Colors.transparent,
+                        color: Colors.white.withFraction(0.04),
                       ),
-                      color:
-                          gameController.boardList[index] == Cellstate.occupied
-                              ? Colors.amber
-                              : Colors.grey[300],
+                      gradient: isOccupied
+                          ? LinearGradient(
+                              colors: AppColors.highlightGradient,
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            )
+                          : null,
+                      color: isOccupied
+                          ? null
+                          : AppColors.surfaceAlt.withFraction(0.85),
+                      boxShadow: [
+                        BoxShadow(
+                          color: isOccupied
+                              ? AppColors.accent.withFraction(0.35)
+                              : Colors.black.withFraction(0.25),
+                          blurRadius: 12,
+                          offset: Offset(0, 4),
+                        )
+                      ],
                     ),
                   );
                 });

@@ -1,3 +1,4 @@
+import 'package:overlap/constants/app_colors.dart';
 import 'package:overlap/constants/game_constant.dart';
 import 'package:flutter/material.dart';
 
@@ -12,11 +13,22 @@ class ScoreWidget extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Text(
-          score,
-          style: TextStyle(
-            fontSize: ResponsiveSizes.scoreTextSize(),
-            fontWeight: FontWeight.bold,
+        ShaderMask(
+          shaderCallback: (Rect bounds) {
+            return LinearGradient(
+              colors: AppColors.highlightGradient,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ).createShader(bounds);
+          },
+          blendMode: BlendMode.srcIn,
+          child: Text(
+            score,
+            style: TextStyle(
+              fontSize: ResponsiveSizes.scoreTextSize(),
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.5,
+            ),
           ),
         ),
         SizedBox(
@@ -30,6 +42,7 @@ class ScoreWidget extends StatelessWidget {
                 child: Image.asset(
                   'assets/image/highscore.png',
                   fit: BoxFit.contain,
+                  color: AppColors.accent,
                 ),
               ),
               SizedBox(
@@ -39,8 +52,8 @@ class ScoreWidget extends StatelessWidget {
                 highScore,
                 style: TextStyle(
                   fontSize: ResponsiveSizes.highScoreTextSize(),
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],

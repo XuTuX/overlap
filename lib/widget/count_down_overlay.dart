@@ -1,3 +1,4 @@
+import 'package:overlap/constants/app_colors.dart';
 import 'package:overlap/constants/game_constant.dart';
 import 'package:flutter/material.dart';
 
@@ -32,14 +33,27 @@ class _CountdownOverlayState extends State<CountdownOverlay> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Color(0xFFF7F1E0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: AppColors.overlayGradient,
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
       alignment: Alignment.center,
       child: Text(
         countdown.toString(),
         style: TextStyle(
           fontSize: 80,
-          color: Colors.black,
-          fontWeight: FontWeight.bold,
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.5,
+          shadows: [
+            Shadow(
+              blurRadius: 12,
+              color: AppColors.accent.withFraction(0.6),
+            ),
+          ],
         ),
       ),
     );

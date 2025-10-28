@@ -1,3 +1,4 @@
+import 'package:overlap/constants/app_colors.dart';
 import 'package:overlap/constants/game_constant.dart';
 import 'package:overlap/models/tetris_model.dart';
 import 'package:flutter/material.dart';
@@ -64,17 +65,17 @@ class GameDrag extends StatelessWidget {
               ElevatedButton(
                 onPressed: () => gameController.rotateBlock(index),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromRGBO(224, 224, 224, 0.6),
-                  shadowColor: Colors.transparent, // 그림자 제거로 미니멀하게
-                  elevation: 0, // 평면 느낌
-                  shape: const CircleBorder(), // 둥근 버튼
-                  padding: const EdgeInsets.all(8), // 여백 넉넉하게
+                  backgroundColor: AppColors.surface,
+                  shadowColor: AppColors.accent.withFraction(0.25),
+                  elevation: 6,
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(10),
                 ),
                 child: Image.asset(
                   'assets/image/rotate.png',
                   width: ResponsiveSizes.rotateIconSize(),
                   height: ResponsiveSizes.rotateIconSize(),
-                  color: Colors.orangeAccent, // 아이콘 색 통일감 있게 조정 (선택사항)
+                  color: AppColors.accent,
                 ),
               ),
             ],

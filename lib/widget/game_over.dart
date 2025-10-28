@@ -1,3 +1,4 @@
+import 'package:overlap/constants/app_colors.dart';
 import 'package:overlap/constants/game_constant.dart';
 import 'package:overlap/controller/game_controller.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +16,9 @@ class Gameover extends StatelessWidget {
           'Game over',
           style: TextStyle(
             fontSize: ResponsiveSizes.gameOverTextSize(),
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+            letterSpacing: 1.2,
           ),
         ),
         SizedBox(
@@ -28,6 +31,7 @@ class Gameover extends StatelessWidget {
               icon: Icon(
                 Icons.home_rounded,
                 size: ResponsiveSizes.gameOverIconSize(),
+                color: AppColors.accent,
               ),
             ),
             IconButton(
@@ -35,6 +39,7 @@ class Gameover extends StatelessWidget {
               icon: Icon(
                 Icons.replay_rounded,
                 size: ResponsiveSizes.gameOverIconSize(),
+                color: AppColors.accentSecondary,
               ),
             ),
           ],

@@ -1,4 +1,5 @@
 // circular_timer_view.dart
+import 'package:overlap/constants/app_colors.dart';
 import 'package:overlap/constants/game_constant.dart';
 import 'package:overlap/controller/game_controller.dart';
 import 'package:overlap/controller/timer_controller.dart';
@@ -28,15 +29,50 @@ class CircularTimer extends StatelessWidget {
               return Stack(
                 alignment: Alignment.center,
                 children: [
-                  SizedBox(
+                  Container(
                     width: TIMER_SIZE,
                     height: TIMER_SIZE,
-                    child: CircularProgressIndicator(
-                      value: 1 - (seconds / timerController.duration.value),
-                      strokeWidth: 11.0,
-                      backgroundColor: Colors.grey[300],
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        isWarning ? Colors.red : Colors.black,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: isWarning
+                            ? AppColors.warningGradient
+                            : AppColors.highlightGradient,
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (isWarning
+                                  ? AppColors.accentTertiary
+                                  : AppColors.accent)
+                              .withFraction(0.45),
+                          blurRadius: 18,
+                          offset: Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: DecoratedBox(
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.surface,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(
+                            value: 1 - (seconds / timerController.duration.value),
+                            strokeWidth: 11.0,
+                            backgroundColor:
+                                AppColors.surfaceAlt.withFraction(0.6),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              isWarning
+                                  ? AppColors.accentTertiary
+                                  : AppColors.accent,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -44,8 +80,8 @@ class CircularTimer extends StatelessWidget {
                     seconds.toStringAsFixed(1), // 0.1초 단위로 표시
                     style: const TextStyle(
                       fontSize: 24.0,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ],

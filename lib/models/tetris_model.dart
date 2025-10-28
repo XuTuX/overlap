@@ -1,3 +1,4 @@
+import 'package:overlap/constants/app_colors.dart';
 import 'package:overlap/constants/game_constant.dart';
 import 'package:flutter/material.dart';
 
@@ -7,10 +8,12 @@ class TetrisModel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double cellSpacing = 1.0;
+    const double cellSpacing = 1.0;
 
-    final minX = blockList.map((e) => e.dx).reduce((a, b) => a < b ? a : b);
-    final minY = blockList.map((e) => e.dy).reduce((a, b) => a < b ? a : b);
+    final double minX =
+        blockList.map((e) => e.dx).reduce((a, b) => a < b ? a : b);
+    final double minY =
+        blockList.map((e) => e.dy).reduce((a, b) => a < b ? a : b);
 
     return Container(
       decoration: BoxDecoration(border: Border.all(color: Colors.transparent)),
@@ -27,8 +30,19 @@ class TetrisModel extends StatelessWidget {
               width: (BOARD_CELL_SIZE - cellSpacing * 2),
               height: (BOARD_CELL_SIZE - cellSpacing * 2),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                color: Colors.amber,
+                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  colors: AppColors.highlightGradient,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.accent.withFraction(0.45),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
             ),
           );

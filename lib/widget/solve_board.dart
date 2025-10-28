@@ -1,3 +1,4 @@
+import 'package:overlap/constants/app_colors.dart';
 import 'package:overlap/constants/game_constant.dart';
 import 'package:overlap/controller/game_controller.dart';
 import 'package:overlap/enum/bord_enum.dart';
@@ -17,6 +18,25 @@ class SolveBoard extends StatelessWidget {
             padding: EdgeInsets.all(6),
             height: SOLVE_SIZE,
             width: SOLVE_SIZE,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              gradient: LinearGradient(
+                colors: AppColors.boardGradient.reversed.toList(),
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              border: Border.all(
+                color: AppColors.textSecondary.withFraction(0.3),
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withFraction(0.35),
+                  blurRadius: 16,
+                  offset: Offset(0, 6),
+                ),
+              ],
+            ),
             child: GridView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
@@ -32,14 +52,32 @@ class SolveBoard extends StatelessWidget {
                       height: SOLVE_CELL_SIZE,
                       margin: EdgeInsets.all(2),
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(3),
+                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: Colors.transparent,
+                            color: Colors.white.withFraction(0.04),
                           ),
+                          gradient: solveController.solveList[index] ==
+                                  Cellstate.occupied
+                              ? LinearGradient(
+                                  colors: AppColors.highlightGradient,
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                )
+                              : null,
                           color: solveController.solveList[index] ==
                                   Cellstate.occupied
-                              ? Colors.amber // 나의 색상
-                              : Colors.grey[300]),
+                              ? null
+                              : AppColors.surface.withFraction(0.85),
+                          boxShadow: [
+                            BoxShadow(
+                              color: solveController.solveList[index] ==
+                                      Cellstate.occupied
+                                  ? AppColors.accent.withFraction(0.3)
+                                  : Colors.black.withFraction(0.2),
+                              blurRadius: 10,
+                              offset: Offset(0, 3),
+                            ),
+                          ]),
                     );
                   });
                 }),
