@@ -116,7 +116,7 @@ class _ArcadeMapScreenState extends State<ArcadeMapScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: OutlinedButton.icon(
-                  onPressed: () => Get.back(),
+                  onPressed: () => Get.offAllNamed('/home'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.white70,
                     side: BorderSide(

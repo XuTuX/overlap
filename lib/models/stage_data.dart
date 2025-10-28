@@ -46,7 +46,7 @@ final List<StageData> arcadeStages = [
     id: 2,
     title: 'Stage 2: Bridge',
     minMoves: 4,
-    blockNames: ['O', 'S', 'Z', 'T'],
+    blockNames: ['O', 'S'],
     solutionPattern: [
       [1, 1, 0, 1, 1],
       [1, 1, 0, 1, 1],
@@ -59,7 +59,7 @@ final List<StageData> arcadeStages = [
     id: 3,
     title: 'Stage 3: Arrow',
     minMoves: 4,
-    blockNames: ['T', 'L', 'J'],
+    blockNames: ['T', 'J'],
     solutionPattern: [
       [0, 1, 0, 1, 0],
       [0, 1, 1, 1, 0],
@@ -72,7 +72,7 @@ final List<StageData> arcadeStages = [
     id: 4,
     title: 'Stage 4: Steps',
     minMoves: 5,
-    blockNames: ['L', 'J', 'S', 'Z', 'O'],
+    blockNames: ['L', 'O'],
     solutionPattern: [
       [1, 0, 0, 0, 0],
       [1, 1, 0, 0, 0],
