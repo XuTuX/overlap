@@ -53,8 +53,6 @@ class GameController extends GetxController {
   }
 
   void generatePuzzle() {
-    solveList.fillRange(0, solveList.length, Cellstate.empty);
-
     _generateRandomPuzzle();
   }
 
@@ -88,9 +86,8 @@ class GameController extends GetxController {
       return;
     }
     final index = row * COL + col;
-    target[index] = target[index] == Cellstate.empty
-        ? Cellstate.occupied
-        : Cellstate.empty;
+    target[index] =
+        target[index] == Cellstate.empty ? Cellstate.occupied : Cellstate.empty;
   }
 
   void toggleBlockOnSolve(List<Offset> block, int col, int row) {
@@ -301,7 +298,6 @@ class GameController extends GetxController {
         timerController.reduceTime();
         stage.value += 1;
 
-        resetBoard();
         undoStack.clear();
         applyNextBlockOverlay();
         timerController.startTimer(); // 타이머 재시작!
