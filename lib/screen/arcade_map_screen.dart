@@ -1,5 +1,3 @@
-import 'dart:ui' show PathMetric;
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:overlap/constants/app_colors.dart';
@@ -21,12 +19,12 @@ class _ArcadeMapScreenState extends State<ArcadeMapScreen> {
   @override
   void initState() {
     super.initState();
-    final hive = HiveGameBox();
-    final startIndex =
+    final HiveGameBox hive = HiveGameBox();
+    final int startIndex =
         hive.getClearedStage().clamp(0, arcadeStages.length - 1);
     _currentIndex = startIndex;
     _pageController = PageController(
-      viewportFraction: 0.72,
+      viewportFraction: 0.82,
       initialPage: startIndex,
     );
   }
@@ -41,24 +39,9 @@ class _ArcadeMapScreenState extends State<ArcadeMapScreen> {
   Widget build(BuildContext context) {
     final ArcadeGameController controller = Get.find<ArcadeGameController>();
     final HiveGameBox hive = HiveGameBox();
-    final int highestCleared = hive.getClearedStage();
+    final int clearedStage = hive.getClearedStage();
     final double progress =
-        (highestCleared / arcadeStages.length).clamp(0.0, 1.0);
-
-    final int targetIndex =
-        highestCleared.clamp(0, arcadeStages.length - 1);
-
-    if (targetIndex != _currentIndex) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        _pageController.animateToPage(
-          targetIndex,
-          duration: const Duration(milliseconds: 400),
-          curve: Curves.easeOutCubic,
-        );
-        setState(() => _currentIndex = targetIndex);
-      });
-    }
+        (clearedStage / arcadeStages.length).clamp(0.0, 1.0);
 
     return Scaffold(
       appBar: AppBar(
@@ -69,8 +52,8 @@ class _ArcadeMapScreenState extends State<ArcadeMapScreen> {
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF090C1C),
-              Color(0xFF151D32),
+              Color(0xFF0B1124),
+              Color(0xFF141C31),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -80,123 +63,73 @@ class _ArcadeMapScreenState extends State<ArcadeMapScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 16),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '스테이지 선택',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      highestCleared >= arcadeStages.length
-                          ? '모든 코스를 클리어했습니다!'
-                          : 'Stage ${highestCleared + 1}까지 진행 중',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: LinearProgressIndicator(
-                        minHeight: 10,
-                        value: progress,
-                        backgroundColor:
-                            Colors.white.withValues(alpha: 0.12),
-                        valueColor: const AlwaysStoppedAnimation<Color>(
-                          Color(0xFFFF8A65),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 28),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 24),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Positioned.fill(
-                            child: CustomPaint(
-                              painter: _StagePathPainter(
-                                stageCount: arcadeStages.length,
-                                clearedStageId: highestCleared,
-                                selectedIndex: _currentIndex,
-                                progress: progress,
-                              ),
-                            ),
-                          ),
-                          PageView.builder(
-                            controller: _pageController,
-                            physics: const BouncingScrollPhysics(),
-                            onPageChanged: (index) {
-                              setState(() => _currentIndex = index);
-                            },
-                            itemCount: arcadeStages.length,
-                            itemBuilder: (context, index) {
-                              final StageData stage = arcadeStages[index];
-                              final int stageId = stage.id;
-                              final bool isCleared = stageId <= highestCleared;
-                              final bool isUnlocked =
-                                  stageId <= highestCleared + 1;
-                              final bool isCurrent =
-                                  highestCleared >= arcadeStages.length
-                                      ? index == arcadeStages.length - 1
-                                      : stageId == highestCleared + 1;
-                              final bool isSelected =
-                                  index == _currentIndex;
-
-                              return AnimatedScale(
-                                scale: isSelected ? 1.0 : 0.92,
-                                duration:
-                                    const Duration(milliseconds: 250),
-                                child: _StageCard(
-                                  stage: stage,
-                                  isCleared: isCleared,
-                                  isUnlocked: isUnlocked,
-                                  isCurrent: isCurrent,
-                                  onPlay: () {
-                                    if (!isUnlocked) {
-                                      Get.snackbar(
-                                        '잠겨있는 스테이지',
-                                        '먼저 이전 스테이지를 완료해야 해요.',
-                                        backgroundColor: Colors.black87,
-                                        colorText: Colors.white,
-                                      );
-                                      return;
-                                    }
-                                    controller.loadStage(stage);
-                                    controller.isStageCleared.value = false;
-                                    Get.toNamed('/arcade/game');
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12),
+                child: _ProgressHeader(
+                  clearedStage: clearedStage,
+                  progress: progress,
                 ),
               ),
               const SizedBox(height: 12),
+              SizedBox(
+                height: 360,
+                child: PageView.builder(
+                  controller: _pageController,
+                  physics: const BouncingScrollPhysics(),
+                  onPageChanged: (index) {
+                    setState(() => _currentIndex = index);
+                  },
+                  itemCount: arcadeStages.length,
+                  itemBuilder: (context, index) {
+                    final StageData stage = arcadeStages[index];
+                    final int stageId = stage.id;
+                    final bool isCleared = stageId <= clearedStage;
+                    final bool isUnlocked = stageId <= clearedStage + 1;
+                    final bool isSelected = index == _currentIndex;
+
+                    return AnimatedScale(
+                      duration: const Duration(milliseconds: 200),
+                      scale: isSelected ? 1.0 : 0.94,
+                      child: _StagePreviewCard(
+                        stage: stage,
+                        isCleared: isCleared,
+                        isUnlocked: isUnlocked,
+                        onPlay: () {
+                          if (!isUnlocked) return;
+                          controller.isStageCleared.value = false;
+                          controller.loadStage(stage);
+                          Get.toNamed('/arcade/game');
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 18),
               _StageIndicator(
                 itemCount: arcadeStages.length,
                 currentIndex: _currentIndex,
-                clearedStage: highestCleared,
+                clearedStage: clearedStage,
+              ),
+              const Spacer(),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: OutlinedButton.icon(
+                  onPressed: () => Get.back(),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white70,
+                    side: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.25),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+                  label: const Text(
+                    '홈으로 돌아가기',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
               ),
               const SizedBox(height: 24),
             ],
@@ -207,262 +140,252 @@ class _ArcadeMapScreenState extends State<ArcadeMapScreen> {
   }
 }
 
-class _StageCard extends StatelessWidget {
+class _ProgressHeader extends StatelessWidget {
+  final int clearedStage;
+  final double progress;
+
+  const _ProgressHeader({
+    required this.clearedStage,
+    required this.progress,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        color: Colors.white.withValues(alpha: 0.06),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Arcade Journey',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  color: Colors.white.withValues(alpha: 0.12),
+                ),
+                child: Text(
+                  'Stage ${clearedStage + 1 > arcadeStages.length ? arcadeStages.length : clearedStage + 1}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: LinearProgressIndicator(
+              minHeight: 10,
+              value: progress,
+              backgroundColor: Colors.white.withValues(alpha: 0.12),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                Color(0xFFFF8A65),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            '${(progress * 100).round()}% 완료',
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StagePreviewCard extends StatelessWidget {
   final StageData stage;
   final bool isCleared;
   final bool isUnlocked;
-  final bool isCurrent;
   final VoidCallback onPlay;
 
-  const _StageCard({
+  const _StagePreviewCard({
     required this.stage,
     required this.isCleared,
     required this.isUnlocked,
-    required this.isCurrent,
     required this.onPlay,
   });
 
   @override
   Widget build(BuildContext context) {
-    final List<String> blockLabels =
-        stage.blockNames.toSet().toList(growable: false);
+    final List<Color> gradient = _stageGradient(isCleared, isUnlocked);
+    final Color chipColor = isUnlocked
+        ? Colors.white.withValues(alpha: 0.28)
+        : Colors.white.withValues(alpha: 0.14);
 
-    final List<Color> palette = isCleared
-        ? const [Color(0xFF3CD3AD), Color(0xFF4CB8C4)]
-        : isUnlocked
-            ? const [Color(0xFFFF9A8B), Color(0xFFFF6A88)]
-            : [
-                Colors.white.withValues(alpha: 0.12),
-                Colors.white.withValues(alpha: 0.06),
-              ];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.all(22),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(32),
-          gradient: LinearGradient(
-            colors: palette,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: palette.last.withValues(
-                alpha: isUnlocked ? 0.35 : 0.15,
-              ),
-              blurRadius: 24,
-              offset: const Offset(0, 18),
-            ),
-          ],
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(32),
+        gradient: LinearGradient(
+          colors: gradient,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: IgnorePointer(
-                child: CustomPaint(
-                  painter: _StagePatternPainter(
-                    color: Colors.white.withValues(alpha: 0.2),
-                  ),
-                ),
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor:
-                          Colors.white.withValues(alpha: 0.18),
-                      child: Text(
-                        '${stage.id}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    if (isCleared)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.22),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: const Text(
-                          'Cleared',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      )
-                    else if (!isUnlocked)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.25),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: const Text(
-                          'Locked',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      )
-                    else if (isCurrent)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.22),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: const Text(
-                          'Next Up',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 18),
-                Text(
-                  stage.title,
+        boxShadow: [
+          BoxShadow(
+            color: gradient.last.withValues(alpha: 0.28),
+            blurRadius: 24,
+            offset: const Offset(0, 16),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              CircleAvatar(
+                radius: 26,
+                backgroundColor: Colors.white.withValues(alpha: 0.18),
+                child: Text(
+                  stage.id.toString().padLeft(2, '0'),
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    letterSpacing: 0.4,
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  '최소 ${stage.minMoves}번 배치 / 사용 블록 ${stage.blockNames.length}개',
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.white.withValues(alpha: 0.16),
+                ),
+                child: Text(
+                  isCleared
+                      ? 'Cleared'
+                      : isUnlocked
+                          ? 'Ready'
+                          : 'Locked',
                   style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 18),
-                const Text(
-                  '블록 조합',
-                  style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: blockLabels
-                      .map(
-                        (block) => Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.22),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Text(
-                            block,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                ),
-                const Spacer(),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: isUnlocked ? onPlay : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: AppColors.background,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 14,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                        ),
-                        icon: const Icon(Icons.play_arrow_rounded),
-                        label: Text(
-                          isUnlocked ? 'Start Stage' : 'Locked',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Text(
+            stage.title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.4,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '최소 ${stage.minMoves}번 배치 · 블록 ${stage.blockNames.length}개',
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 18),
+          const Text(
+            '사용 블록',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: stage.blockNames
+                .toSet()
+                .map(
+                  (block) => Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: chipColor,
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: Text(
+                      block,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          'Stage Goal',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12,
-                          ),
-                        ),
-                        Text(
-                          isCleared
-                              ? '완료됨'
-                              : 'Pattern ${stage.id.toString().padLeft(2, '0')}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
+                )
+                .toList(),
+          ),
+          const Spacer(),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: isUnlocked ? onPlay : null,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                backgroundColor: Colors.white,
+                foregroundColor: AppColors.background,
+                disabledBackgroundColor: Colors.white.withValues(alpha: 0.4),
+                disabledForegroundColor: AppColors.background.withValues(
+                  alpha: 0.6,
                 ),
-              ],
-            ),
-            if (!isUnlocked)
-              Positioned(
-                top: 24,
-                right: 24,
-                child: Icon(
-                  Icons.lock_rounded,
-                  color: Colors.white.withValues(alpha: 0.3),
-                  size: 30,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
                 ),
               ),
-          ],
-        ),
+              icon: const Icon(Icons.play_arrow_rounded),
+              label: Text(
+                isUnlocked ? 'Stage ${stage.id} 시작' : '잠금 해제 필요',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  List<Color> _stageGradient(bool isCleared, bool isUnlocked) {
+    if (isCleared) {
+      return const [Color(0xFF3CD3AD), Color(0xFF4CB8C4)];
+    }
+    if (isUnlocked) {
+      return const [Color(0xFFFF9A8B), Color(0xFFFF6A88)];
+    }
+    return [
+      const Color(0xFF23283B),
+      const Color(0xFF1A1F30),
+    ];
   }
 }
 
@@ -494,7 +417,7 @@ class _StageIndicator extends StatelessWidget {
                 : Colors.white24;
 
         return AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
+          duration: const Duration(milliseconds: 200),
           margin: const EdgeInsets.symmetric(horizontal: 4),
           height: 8,
           width: isActive ? 22 : 10,
@@ -505,142 +428,5 @@ class _StageIndicator extends StatelessWidget {
         );
       }),
     );
-  }
-}
-
-class _StagePathPainter extends CustomPainter {
-  final int stageCount;
-  final int clearedStageId;
-  final int selectedIndex;
-  final double progress;
-
-  _StagePathPainter({
-    required this.stageCount,
-    required this.clearedStageId,
-    required this.selectedIndex,
-    required this.progress,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (stageCount <= 1) return;
-
-    final double midY = size.height * 0.55;
-    final double wave = size.height * 0.25;
-    final double spacing = size.width / (stageCount - 1);
-
-    final Path path = Path()..moveTo(0, midY);
-    for (int i = 1; i < stageCount; i++) {
-      final double x = spacing * i;
-      final double controlX = spacing * (i - 0.5);
-      final double controlY = midY + (i.isEven ? -wave : wave);
-      path.quadraticBezierTo(controlX, controlY, x, midY);
-    }
-
-    final Paint basePaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.12)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 6
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawPath(path, basePaint);
-
-    final List<PathMetric> metrics = path.computeMetrics().toList();
-    if (metrics.isNotEmpty) {
-      final PathMetric metric = metrics.first;
-      final double drawLength = metric.length * progress;
-      if (drawLength > 0) {
-        final Path highlightPath = metric.extractPath(0, drawLength);
-        final Paint highlightPaint = Paint()
-          ..shader = const LinearGradient(
-            colors: [
-              Color(0xFFFFC371),
-              Color(0xFFFF5F6D),
-            ],
-          ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 6
-          ..strokeCap = StrokeCap.round;
-        canvas.drawPath(highlightPath, highlightPaint);
-      }
-    }
-
-    for (int i = 0; i < stageCount; i++) {
-      final int stageId = i + 1;
-      final bool isCleared = stageId <= clearedStageId;
-      final bool isUnlocked = stageId <= clearedStageId + 1;
-      final bool isSelected = i == selectedIndex;
-
-      final double radius = isSelected
-          ? 14
-          : isCleared
-              ? 11
-              : 9;
-
-      final Paint fillPaint = Paint()
-        ..color = isCleared
-            ? const Color(0xFFFF9A8B)
-            : isUnlocked
-                ? Colors.white.withValues(alpha: 0.85)
-                : Colors.white.withValues(alpha: 0.3);
-
-      final Offset center = Offset(spacing * i, midY);
-      canvas.drawCircle(center, radius, fillPaint);
-
-      final Paint borderPaint = Paint()
-        ..color = Colors.black.withValues(alpha: 0.18)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2;
-      canvas.drawCircle(center, radius, borderPaint);
-
-      if (isSelected) {
-        final Paint ringPaint = Paint()
-          ..color = Colors.white.withValues(alpha: 0.9)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 3;
-        canvas.drawCircle(center, radius + 4, ringPaint);
-      }
-
-      if (isCleared) {
-        final Paint corePaint = Paint()
-          ..color = Colors.white.withValues(alpha: 0.9);
-        canvas.drawCircle(center, radius * 0.45, corePaint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _StagePathPainter oldDelegate) {
-    return oldDelegate.stageCount != stageCount ||
-        oldDelegate.clearedStageId != clearedStageId ||
-        oldDelegate.selectedIndex != selectedIndex ||
-        oldDelegate.progress != progress;
-  }
-}
-
-class _StagePatternPainter extends CustomPainter {
-  final Color color;
-
-  _StagePatternPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..color = color
-      ..strokeWidth = 6
-      ..strokeCap = StrokeCap.round;
-
-    for (double dx = -size.height; dx < size.width; dx += 30) {
-      canvas.drawLine(
-        Offset(dx, size.height),
-        Offset(dx + size.height, 0),
-        paint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _StagePatternPainter oldDelegate) {
-    return oldDelegate.color != color;
   }
 }
