@@ -41,11 +41,51 @@ class ArcadeGameScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 24),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              controller.isStageCleared.value = false;
+                              Get.offAllNamed('/arcade');
+                            },
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                stage.title,
+                                style: TextStyle(
+                                  fontSize: ResponsiveSizes.mainTextSize(),
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            onPressed: controller.restartStage,
+                            icon: const Icon(
+                              Icons.refresh_rounded,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     SizedBox(height: CELL_HEIGHT),
                     _StageStatsRow(stage: stage),
                     SizedBox(height: CELL_HEIGHT),
                     const ArcadeGameBoard(),
-                    SizedBox(height: CELL_HEIGHT),
+                    const SizedBox(height: 16),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: Row(
@@ -79,7 +119,7 @@ class ArcadeGameScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    SizedBox(height: CELL_HEIGHT * 2),
+                    SizedBox(height: CELL_HEIGHT * 1.5),
                     const ArcadeGameDrag(),
                     SizedBox(height: CELL_HEIGHT),
                   ],
@@ -183,7 +223,7 @@ class _StageStatsRow extends StatelessWidget {
                           width: 3,
                           height: 24,
                           decoration: BoxDecoration(
-                            color: AppColors.accent.withOpacity(0.7),
+                            color: AppColors.accent.withValues(alpha: 0.7),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
