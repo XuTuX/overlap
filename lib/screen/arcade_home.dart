@@ -119,26 +119,15 @@ class _MonthCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(12),
+          margin: EdgeInsets.all(5),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(30),
             gradient: chapter.gradient,
-            boxShadow: [
-              BoxShadow(
-                color: chapter.secondaryColor.withValues(alpha: 0.35),
-                blurRadius: 28,
-                offset: const Offset(0, 16),
-              ),
-            ],
-            border: isSelected
-                ? Border.all(
-                    color: Colors.white.withValues(alpha: 0.6),
-                    width: 2.2,
-                  )
-                : null,
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 chapter.title,
@@ -149,46 +138,13 @@ class _MonthCard extends StatelessWidget {
                   letterSpacing: 0.5,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 20),
               Text(
                 '${chapter.stageIds.length} stages',
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.85),
                   fontWeight: FontWeight.w600,
                 ),
-              ),
-              const Spacer(),
-              Row(
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(18),
-                      color: Colors.white.withValues(alpha: 0.18),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.play_arrow_rounded,
-                            color: Colors.white, size: 18),
-                        SizedBox(width: 6),
-                        Text(
-                          'Play',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Spacer(),
-                  Icon(
-                    Icons.calendar_month_rounded,
-                    color: Colors.white.withValues(alpha: 0.9),
-                    size: 26,
-                  ),
-                ],
               ),
             ],
           ),

@@ -52,6 +52,8 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'overlap',
+      transitionDuration: const Duration(milliseconds: 300),
+      defaultTransition: Transition.rightToLeft,
       theme: ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: AppColors.background,

@@ -179,10 +179,6 @@ class _ComingSoonBanner extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(28),
-          color: Colors.white.withValues(alpha: 0.08),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.2),
-          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
