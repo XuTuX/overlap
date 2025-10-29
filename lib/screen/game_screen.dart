@@ -32,6 +32,100 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Obx(() {
+          final double highScore = hiveGameBox.getHighScore();
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // 홈 버튼
+              IconButton(
+                icon: const Icon(Icons.home_rounded, color: Colors.white),
+                onPressed: () {
+                  Get.dialog(
+                    Dialog(
+                      backgroundColor: Colors.black.withOpacity(0.85),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.exit_to_app_rounded,
+                              size: 48,
+                              color: AppColors.accent,
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              '홈 화면으로 돌아가시겠어요?',
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              '진행 중인 게임은 저장되지 않습니다.',
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 14,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 24),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                TextButton(
+                                  onPressed: Get.back,
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: AppColors.textSecondary,
+                                  ),
+                                  child: const Text('취소'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Get.offAllNamed('/home');
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.accent,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: const Text('나가기'),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    barrierDismissible: false,
+                  );
+                },
+              ),
+              // 점수 표시
+              Expanded(
+                child: Center(
+                  child: ScoreWidget(
+                    score: gameController.score.toString(),
+                    highScore: highScore.toString(),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 48),
+            ],
+          );
+        }),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -52,14 +146,6 @@ class _GameScreenState extends State<GameScreen> {
             return Column(
               children: [
                 const SizedBox(height: 40),
-                Obx(() {
-                  final double highScore = hiveGameBox.getHighScore();
-                  return ScoreWidget(
-                    score: gameController.score.toString(),
-                    highScore: highScore.toString(),
-                  );
-                }),
-                SizedBox(height: CELL_HEIGHT),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
