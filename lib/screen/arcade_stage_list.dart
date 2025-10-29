@@ -106,6 +106,7 @@ class _ArcadeStageListScreenState extends State<ArcadeStageListScreen> {
                 itemCount: stageIds.length,
                 itemBuilder: (context, index) {
                   final int stageId = stageIds[index];
+                  final int displayNumber = index + 1;
                   final StageData? stageData = arcadeStageMap[stageId];
                   final int starCount =
                       _arcadeController.starsForStage(stageId);
@@ -117,7 +118,7 @@ class _ArcadeStageListScreenState extends State<ArcadeStageListScreen> {
                       isAvailable && _arcadeController.isStageCleared(stageId);
 
                   return StageBox(
-                    label: stageId.toString().padLeft(2, '0'),
+                    label: displayNumber.toString().padLeft(2, '0'),
                     stars: starCount,
                     isUnlocked: isUnlocked,
                     isCleared: isCleared,
