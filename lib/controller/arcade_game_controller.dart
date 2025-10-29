@@ -3,14 +3,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:overlap/constants/game_constant.dart';
+import 'package:overlap/controller/arcade_controller.dart';
 import 'package:overlap/enum/bord_enum.dart';
 import 'package:overlap/models/game_state.dart';
-import 'package:overlap/models/hive_game_box.dart';
 import 'package:overlap/models/stage_data.dart';
 
 class ArcadeGameController extends GetxController {
-  final HiveGameBox hiveGameBox = HiveGameBox();
-
   final RxList<Cellstate> boardList =
       RxList.generate(COL * ROW, (_) => Cellstate.empty);
   final RxList<Cellstate> solveList =
@@ -227,10 +225,10 @@ class ArcadeGameController extends GetxController {
 
     final stage = currentStage.value;
     if (stage != null) {
-      hiveGameBox.setClearedStage(stage.id);
       final int moves = currentMoves.value;
       final int stars = calculateStars(moves, stage.minMoves);
-      hiveGameBox.setStageStar(stage.id, stars);
+      final ArcadeController arcadeController = Get.find<ArcadeController>();
+      arcadeController.recordStageProgress(stageId: stage.id, stars: stars);
     }
 
     await Future.delayed(const Duration(milliseconds: 700));

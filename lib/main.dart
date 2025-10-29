@@ -4,11 +4,13 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:overlap/constants/app_colors.dart';
+import 'package:overlap/controller/arcade_controller.dart';
 import 'package:overlap/controller/arcade_game_controller.dart';
 import 'package:overlap/controller/game_controller.dart';
 import 'package:overlap/models/hive_game_box.dart';
 import 'package:overlap/screen/arcade_game_screen.dart';
-import 'package:overlap/screen/arcade_map_screen.dart';
+import 'package:overlap/screen/arcade_home.dart';
+import 'package:overlap/screen/arcade_stage_list.dart';
 import 'package:overlap/screen/game_screen.dart';
 import 'package:overlap/screen/home_screen.dart';
 import 'package:overlap/screen/login_screen.dart';
@@ -91,6 +93,7 @@ class MyApp extends StatelessWidget {
       initialBinding: BindingsBuilder(() {
         Get.put(GameController(), permanent: true);
         Get.put(ArcadeGameController(), permanent: true);
+        Get.put(ArcadeController(), permanent: true);
       }),
       getPages: [
         GetPage(
@@ -99,7 +102,11 @@ class MyApp extends StatelessWidget {
         ),
         GetPage(
           name: '/arcade',
-          page: () => ArcadeMapScreen(),
+          page: () => const ArcadeHomeScreen(),
+        ),
+        GetPage(
+          name: '/arcade/stages',
+          page: () => const ArcadeStageListScreen(),
         ),
         GetPage(
           name: '/arcade/game',

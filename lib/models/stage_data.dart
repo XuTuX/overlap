@@ -290,3 +290,7 @@ final List<StageData> arcadeStages = [
     ],
   ),
 ];
+
+final Map<int, StageData> arcadeStageMap = {
+  for (final stage in arcadeStages) stage.id: stage,
+};

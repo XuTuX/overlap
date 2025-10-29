@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:overlap/constants/app_colors.dart';
 import 'package:overlap/controller/arcade_game_controller.dart';
+import 'package:overlap/models/arcade_chapter.dart';
 import 'package:overlap/models/hive_game_box.dart';
 import 'package:overlap/models/stage_data.dart';
 
@@ -13,26 +16,36 @@ class ArcadeMapScreen extends StatefulWidget {
 }
 
 class _ArcadeMapScreenState extends State<ArcadeMapScreen> {
-  late final PageController _pageController;
-  int _currentIndex = 0;
+  late final List<ArcadeChapter> _chapters;
+  late final List<int> _initialStagePages;
 
   @override
   void initState() {
     super.initState();
     final HiveGameBox hive = HiveGameBox();
-    final int startIndex =
-        hive.getClearedStage().clamp(0, arcadeStages.length - 1);
-    _currentIndex = startIndex;
-    _pageController = PageController(
-      viewportFraction: 0.82,
-      initialPage: startIndex,
-    );
-  }
+    final int clearedStage = hive.getClearedStage();
+    final int highestStageId = arcadeStageMap.isEmpty
+        ? 1
+        : arcadeStageMap.keys.reduce(max);
+    final int normalizedNextStageId =
+        (clearedStage + 1).clamp(1, highestStageId);
 
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
+    _chapters = arcadeChapters
+        .where((chapter) => chapter.stages.isNotEmpty)
+        .toList(growable: false);
+
+    _initialStagePages = _chapters.map((chapter) {
+      final stages = chapter.stages;
+      if (stages.isEmpty) {
+        return 0;
+      }
+      final int index =
+          stages.indexWhere((stage) => stage.id >= normalizedNextStageId);
+      if (index == -1) {
+        return stages.length - 1;
+      }
+      return index;
+    }).toList(growable: false);
   }
 
   @override
@@ -77,49 +90,29 @@ class _ArcadeMapScreenState extends State<ArcadeMapScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              SizedBox(
-                height: 360,
-                child: PageView.builder(
-                  controller: _pageController,
-                  physics: const BouncingScrollPhysics(),
-                  onPageChanged: (index) {
-                    setState(() => _currentIndex = index);
-                  },
-                  itemCount: arcadeStages.length,
-                  itemBuilder: (context, index) {
-                    final StageData stage = arcadeStages[index];
-                    final int stageId = stage.id;
-                    final bool isCleared = stageId <= clearedStage;
-                    final bool isUnlocked = stageId <= clearedStage + 1;
-                    final bool isSelected = index == _currentIndex;
-                    final int stars = stageStars[stageId] ?? 0;
-
-                    return AnimatedScale(
-                      duration: const Duration(milliseconds: 200),
-                      scale: isSelected ? 1.0 : 0.94,
-                      child: _StagePreviewCard(
-                        stage: stage,
-                        isCleared: isCleared,
-                        isUnlocked: isUnlocked,
-                        stars: stars,
-                        onPlay: () {
-                          if (!isUnlocked) return;
-                          controller.isStageCleared.value = false;
-                          controller.loadStage(stage);
-                          Get.toNamed('/arcade/game');
+              Expanded(
+                child: _chapters.isEmpty
+                    ? const _EmptyChapterPlaceholder()
+                    : ListView.builder(
+                        padding:
+                            const EdgeInsets.fromLTRB(24.0, 8.0, 24.0, 16.0),
+                        itemCount: _chapters.length,
+                        itemBuilder: (context, index) {
+                          final ArcadeChapter chapter = _chapters[index];
+                          final int initialPage = index < _initialStagePages.length
+                              ? _initialStagePages[index]
+                              : 0;
+                          return _ArcadeChapterCard(
+                            key: ValueKey(chapter.id),
+                            chapter: chapter,
+                            clearedStage: clearedStage,
+                            stageStars: stageStars,
+                            controller: controller,
+                            initialPage: initialPage,
+                          );
                         },
                       ),
-                    );
-                  },
-                ),
               ),
-              const SizedBox(height: 18),
-              _StageIndicator(
-                itemCount: arcadeStages.length,
-                currentIndex: _currentIndex,
-                clearedStage: clearedStage,
-              ),
-              const Spacer(),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: OutlinedButton.icon(
@@ -247,6 +240,368 @@ class _ProgressHeader extends StatelessWidget {
   }
 }
 
+class _ArcadeChapterCard extends StatefulWidget {
+  final ArcadeChapter chapter;
+  final int clearedStage;
+  final Map<int, int> stageStars;
+  final ArcadeGameController controller;
+  final int initialPage;
+
+  const _ArcadeChapterCard({
+    super.key,
+    required this.chapter,
+    required this.clearedStage,
+    required this.stageStars,
+    required this.controller,
+    required this.initialPage,
+  });
+
+  @override
+  State<_ArcadeChapterCard> createState() => _ArcadeChapterCardState();
+}
+
+class _ArcadeChapterCardState extends State<_ArcadeChapterCard> {
+  late final PageController _pageController;
+  late int _currentIndex;
+
+  List<StageData> get _stages => widget.chapter.stages;
+
+  @override
+  void initState() {
+    super.initState();
+    final List<StageData> stages = _stages;
+    if (stages.isEmpty) {
+      _currentIndex = 0;
+      _pageController = PageController(viewportFraction: 0.82);
+      return;
+    }
+
+    final int maxIndex = stages.length - 1;
+    _currentIndex = widget.initialPage.clamp(0, maxIndex);
+    _pageController = PageController(
+      viewportFraction: 0.82,
+      initialPage: _currentIndex,
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final List<StageData> stages = _stages;
+    final bool hasStages = stages.isNotEmpty;
+    final List<_ChapterStepSummary> stepSummaries =
+        _buildStepSummaries(widget.chapter.stepCount, stages);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 32),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(32),
+        color: Colors.white.withValues(alpha: 0.05),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.chapter.title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${stages.length} Stages',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.6),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.white.withValues(alpha: 0.1),
+                ),
+                child: Text(
+                  'Step 1-${widget.chapter.stepCount}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (stepSummaries.any((summary) => summary.totalStages > 0)) ...[
+            const SizedBox(height: 18),
+            _StepSummaryRow(summaries: stepSummaries),
+          ],
+          if (hasStages) ...[
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 360,
+              child: PageView.builder(
+                controller: _pageController,
+                physics: const BouncingScrollPhysics(),
+                itemCount: stages.length,
+                onPageChanged: (index) {
+                  setState(() => _currentIndex = index);
+                },
+                itemBuilder: (context, index) {
+                  final StageData stage = stages[index];
+                  final int stageId = stage.id;
+                  final bool isCleared = stageId <= widget.clearedStage;
+                  final bool isUnlocked = stageId <= widget.clearedStage + 1;
+                  final bool isSelected = index == _currentIndex;
+                  final int stars = widget.stageStars[stageId] ?? 0;
+
+                  return AnimatedScale(
+                    duration: const Duration(milliseconds: 200),
+                    scale: isSelected ? 1.0 : 0.94,
+                    child: _StagePreviewCard(
+                      stage: stage,
+                      isCleared: isCleared,
+                      isUnlocked: isUnlocked,
+                      stars: stars,
+                      onPlay: () {
+                        if (!isUnlocked) return;
+                        widget.controller.isStageCleared.value = false;
+                        widget.controller.loadStage(stage);
+                        Get.toNamed('/arcade/game');
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 18),
+            _StageIndicator(
+              stages: stages,
+              currentIndex: _currentIndex,
+              clearedStage: widget.clearedStage,
+            ),
+          ] else ...[
+            const SizedBox(height: 32),
+            _ChapterComingSoonBadge(title: widget.chapter.title),
+          ],
+        ],
+      ),
+    );
+  }
+
+  List<_ChapterStepSummary> _buildStepSummaries(
+    int stepCount,
+    List<StageData> stages,
+  ) {
+    if (stepCount <= 0) {
+      return const [];
+    }
+
+    final List<_ChapterStepSummary> summaries = [];
+    final int baseSize = stages.length ~/ stepCount;
+    final int remainder = stages.length % stepCount;
+
+    int cursor = 0;
+    for (int i = 0; i < stepCount; i++) {
+      final int stepNumber = i + 1;
+      final int extra = i < remainder ? 1 : 0;
+      final int size = baseSize + extra;
+
+      if (cursor >= stages.length || size <= 0) {
+        summaries.add(
+          _ChapterStepSummary(
+            label: '$stepNumber',
+            collectedStars: 0,
+            maxStars: 0,
+            clearedStages: 0,
+            totalStages: 0,
+          ),
+        );
+        continue;
+      }
+
+      final int end = min(cursor + size, stages.length);
+      final List<StageData> group = stages.sublist(cursor, end);
+      cursor = end;
+
+      final int collectedStars = group.fold<int>(
+        0,
+        (sum, stage) => sum + (widget.stageStars[stage.id] ?? 0),
+      );
+      final int maxStars = group.length * 3;
+      final int clearedCount = group.fold<int>(
+        0,
+        (sum, stage) => sum + ((widget.stageStars[stage.id] ?? 0) > 0 ? 1 : 0),
+      );
+
+      summaries.add(
+        _ChapterStepSummary(
+          label: '$stepNumber',
+          collectedStars: collectedStars,
+          maxStars: maxStars,
+          clearedStages: clearedCount,
+          totalStages: group.length,
+        ),
+      );
+    }
+
+    return summaries;
+  }
+}
+
+class _ChapterStepSummary {
+  final String label;
+  final int collectedStars;
+  final int maxStars;
+  final int clearedStages;
+  final int totalStages;
+
+  const _ChapterStepSummary({
+    required this.label,
+    required this.collectedStars,
+    required this.maxStars,
+    required this.clearedStages,
+    required this.totalStages,
+  });
+}
+
+class _StepSummaryRow extends StatelessWidget {
+  final List<_ChapterStepSummary> summaries;
+
+  const _StepSummaryRow({required this.summaries});
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      children: summaries.map((summary) {
+        final bool hasStages = summary.totalStages > 0;
+        final Color background = hasStages
+            ? Colors.white.withValues(alpha: 0.1)
+            : Colors.white.withValues(alpha: 0.04);
+        final Color borderColor = hasStages
+            ? Colors.white.withValues(alpha: 0.24)
+            : Colors.white.withValues(alpha: 0.1);
+
+        return Container(
+          width: 118,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            color: background,
+            border: Border.all(color: borderColor),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${summary.label}단계',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                '별 ${summary.collectedStars}/${summary.maxStars}',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${summary.clearedStages}/${summary.totalStages} 스테이지',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.6),
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _ChapterComingSoonBadge extends StatelessWidget {
+  final String title;
+
+  const _ChapterComingSoonBadge({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        color: Colors.white.withValues(alpha: 0.08),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$title 챕터는 준비 중이에요',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '새로운 스테이지를 곧 만나보실 수 있어요.',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.7),
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyChapterPlaceholder extends StatelessWidget {
+  const _EmptyChapterPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        '새로운 챕터를 준비 중이에요!',
+        style: TextStyle(
+          color: Colors.white.withValues(alpha: 0.7),
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
 class _StagePreviewCard extends StatelessWidget {
   final StageData stage;
   final bool isCleared;
@@ -306,11 +661,11 @@ class _StagePreviewCard extends StatelessWidget {
                   ),
                 ),
               ),
-                      _StageStateBadge(
-                        isCleared: isCleared,
-                        isUnlocked: isUnlocked,
-                        stars: stars,
-                      ),
+              _StageStateBadge(
+                isCleared: isCleared,
+                isUnlocked: isUnlocked,
+                stars: stars,
+              ),
             ],
           ),
           const SizedBox(height: 18),
@@ -493,12 +848,12 @@ class _CompactStarRow extends StatelessWidget {
 }
 
 class _StageIndicator extends StatelessWidget {
-  final int itemCount;
+  final List<StageData> stages;
   final int currentIndex;
   final int clearedStage;
 
   const _StageIndicator({
-    required this.itemCount,
+    required this.stages,
     required this.currentIndex,
     required this.clearedStage,
   });
@@ -507,8 +862,8 @@ class _StageIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(itemCount, (index) {
-        final int stageId = index + 1;
+      children: List.generate(stages.length, (index) {
+        final int stageId = stages[index].id;
         final bool isCleared = stageId <= clearedStage;
         final bool isActive = index == currentIndex;
         final bool isUnlocked = stageId <= clearedStage + 1;

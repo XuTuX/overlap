@@ -1,0 +1,199 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:overlap/controller/arcade_controller.dart';
+import 'package:overlap/models/arcade_chapter.dart';
+
+class ArcadeHomeScreen extends GetView<ArcadeController> {
+  const ArcadeHomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Arcade Mode'),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+      ),
+      extendBodyBehindAppBar: true,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFF0B1124),
+              Color(0xFF111A2E),
+              Color(0xFF1A2342),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Choose Your Month',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                      ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '매달 새로운 스테이지가 열립니다.',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
+                const SizedBox(height: 24),
+                Expanded(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final double maxWidth = constraints.maxWidth;
+                      int crossAxisCount = 2;
+                      if (maxWidth >= 1100) {
+                        crossAxisCount = 4;
+                      } else if (maxWidth >= 780) {
+                        crossAxisCount = 3;
+                      }
+                      return Obx(() {
+                        final String? selectedId =
+                            controller.selectedMonth.value?.id;
+                        return GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount,
+                            crossAxisSpacing: 18,
+                            mainAxisSpacing: 18,
+                            childAspectRatio: 1.1,
+                          ),
+                          itemCount: controller.chapters.length,
+                          itemBuilder: (context, index) {
+                            final ArcadeChapter chapter =
+                                controller.chapters[index];
+                            final bool isSelected = chapter.id == selectedId;
+                            return _MonthCard(
+                              chapter: chapter,
+                              isSelected: isSelected,
+                              onTap: () {
+                                controller.selectMonth(chapter);
+                                controller.refreshProgress();
+                                Get.toNamed('/arcade/stages');
+                              },
+                            );
+                          },
+                        );
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MonthCard extends StatelessWidget {
+  final ArcadeChapter chapter;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _MonthCard({
+    required this.chapter,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedScale(
+      duration: const Duration(milliseconds: 200),
+      scale: isSelected ? 1.02 : 1.0,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(28),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(28),
+            gradient: chapter.gradient,
+            boxShadow: [
+              BoxShadow(
+                color: chapter.secondaryColor.withValues(alpha: 0.35),
+                blurRadius: 28,
+                offset: const Offset(0, 16),
+              ),
+            ],
+            border: isSelected
+                ? Border.all(
+                    color: Colors.white.withValues(alpha: 0.6),
+                    width: 2.2,
+                  )
+                : null,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                chapter.title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 22,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${chapter.stageIds.length} stages',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.85),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Spacer(),
+              Row(
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      color: Colors.white.withValues(alpha: 0.18),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.play_arrow_rounded,
+                            color: Colors.white, size: 18),
+                        SizedBox(width: 6),
+                        Text(
+                          'Play',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    Icons.calendar_month_rounded,
+                    color: Colors.white.withValues(alpha: 0.9),
+                    size: 26,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
