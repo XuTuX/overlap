@@ -12,16 +12,25 @@ import 'package:overlap/widget/score_widget.dart';
 import 'package:overlap/widget/solve_board.dart';
 import 'package:overlap/widget/timer.dart';
 
-class GameScreen extends StatelessWidget {
+class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
 
   @override
+  State<GameScreen> createState() => _GameScreenState();
+}
+
+class _GameScreenState extends State<GameScreen> {
+  final GameController gameController = Get.find<GameController>();
+  final HiveGameBox hiveGameBox = HiveGameBox();
+
+  @override
+  void initState() {
+    super.initState();
+    gameController.resetGame();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final GameController gameController = Get.find<GameController>();
-    final HiveGameBox hiveGameBox = HiveGameBox();
-
-    Future.microtask(() => gameController.startCountdown());
-
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
