@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:overlap/controller/arcade_controller.dart';
 import 'package:overlap/models/arcade_chapter.dart';
+import 'package:overlap/screen/home_screen.dart';
 
 class ArcadeHomeScreen extends GetView<ArcadeController> {
   const ArcadeHomeScreen({super.key});
@@ -13,6 +14,16 @@ class ArcadeHomeScreen extends GetView<ArcadeController> {
         title: const Text('Arcade Mode'),
         centerTitle: true,
         backgroundColor: Colors.transparent,
+        leading: IconButton(
+          icon: const Icon(Icons.home_rounded, color: Colors.white),
+          onPressed: () {
+            Get.offAll(
+              () => const HomeScreen(), // 홈 화면 위젯 직접 명시
+              transition: Transition.leftToRight, // ← 왼쪽으로 스와이프 애니메이션
+              duration: const Duration(milliseconds: 300),
+            );
+          },
+        ),
       ),
       extendBodyBehindAppBar: true,
       body: Container(

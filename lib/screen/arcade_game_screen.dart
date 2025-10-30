@@ -17,6 +17,26 @@ class ArcadeGameScreen extends StatelessWidget {
     final ArcadeGameController controller = Get.find<ArcadeGameController>();
 
     return Scaffold(
+      appBar: AppBar(
+        title: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: 10,
+              ),
+              IconButton(
+                onPressed: controller.restartStage,
+                icon: const Icon(
+                  Icons.refresh_rounded,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -41,46 +61,6 @@ class ArcadeGameScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 24),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              controller.isStageCleared.value = false;
-                              Get.offAllNamed('/arcade');
-                            },
-                            icon: const Icon(
-                              Icons.arrow_back_ios_new_rounded,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                stage.title,
-                                style: TextStyle(
-                                  fontSize: ResponsiveSizes.mainTextSize(),
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.textPrimary,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          IconButton(
-                            onPressed: controller.restartStage,
-                            icon: const Icon(
-                              Icons.refresh_rounded,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                     SizedBox(height: CELL_HEIGHT),
                     _StageStatsRow(stage: stage),
                     SizedBox(height: CELL_HEIGHT),
@@ -151,7 +131,9 @@ class ArcadeGameScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () => Get.offAllNamed('/arcade'),
+            onPressed: () => Get.offAllNamed(
+              '/arcade',
+            ),
             child: const Text('아케이드 맵으로 이동'),
           ),
         ],

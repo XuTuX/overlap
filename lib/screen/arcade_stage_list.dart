@@ -114,14 +114,11 @@ class _ArcadeStageListScreenState extends State<ArcadeStageListScreen> {
                   final bool unlockedByProgress =
                       _arcadeController.isStageUnlocked(stageId);
                   final bool isUnlocked = isAvailable && unlockedByProgress;
-                  final bool isCleared =
-                      isAvailable && _arcadeController.isStageCleared(stageId);
 
                   return StageBox(
                     label: displayNumber.toString().padLeft(2, '0'),
                     stars: starCount,
                     isUnlocked: isUnlocked,
-                    isCleared: isCleared,
                     onTap: () {
                       if (!isUnlocked) return;
                       _arcadeController.selectStage(stageId);

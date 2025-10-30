@@ -1,218 +1,338 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:overlap/controller/arcade_controller.dart';
+import 'package:overlap/controller/arcade_game_controller.dart';
+import 'package:overlap/models/arcade_chapter.dart';
+import 'package:overlap/models/stage_data.dart';
 
-class ArcadeMonthScreen extends StatelessWidget {
-  const ArcadeMonthScreen({super.key});
+class ArcadeStageListScreen extends StatefulWidget {
+  const ArcadeStageListScreen({super.key});
 
-  final List<Map<String, dynamic>> months = const [
-    {
-      'name': 'January',
-      'gradient': [Color(0xFF7F7BFF), Color(0xFF6AC9FF)],
-    },
-    {
-      'name': 'February',
-      'gradient': [Color(0xFFFF8B8B), Color(0xFFFF6A88)],
-    },
-    {
-      'name': 'March',
-      'gradient': [Color(0xFF47E6B1), Color(0xFF50C9C3)],
-    },
-    {
-      'name': 'April',
-      'gradient': [Color(0xFF56CCF2), Color(0xFF2F80ED)],
-    },
-    {
-      'name': 'May',
-      'gradient': [Color(0xFFFFA751), Color(0xFFFF7C5C)],
-    },
-    {
-      'name': 'June',
-      'gradient': [Color(0xFF8EC5FC), Color(0xFFE0C3FC)],
-    },
-    {
-      'name': 'July',
-      'gradient': [Color(0xFFFF9A9E), Color(0xFFFAD0C4)],
-    },
-    {
-      'name': 'August',
-      'gradient': [Color(0xFF43E97B), Color(0xFF38F9D7)],
-    },
-    {
-      'name': 'September',
-      'gradient': [Color(0xFFFF758C), Color(0xFFFF7EB3)],
-    },
-    {
-      'name': 'October',
-      'gradient': [Color(0xFFFFCC70), Color(0xFFFFAF7B)],
-    },
-    {
-      'name': 'November',
-      'gradient': [Color(0xFF30CFD0), Color(0xFF330867)],
-    },
-    {
-      'name': 'December',
-      'gradient': [Color(0xFF5EE7DF), Color(0xFFB490CA)],
-    },
-  ];
+  @override
+  State<ArcadeStageListScreen> createState() => _ArcadeStageListScreenState();
+}
+
+class _ArcadeStageListScreenState extends State<ArcadeStageListScreen>
+    with SingleTickerProviderStateMixin {
+  late final ArcadeController _arcadeController;
+  late final ArcadeGameController _gameController;
+  late final AnimationController _bgAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _arcadeController = Get.find<ArcadeController>();
+    _gameController = Get.find<ArcadeGameController>();
+    _arcadeController.refreshProgress();
+
+    _bgAnimation = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 12),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _bgAnimation.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0B1124),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon:
-              const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-          onPressed: () => Get.back(),
-        ),
-        title: const Text(
-          'Arcade Mode',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
+    return Obx(() {
+      final ArcadeChapter? chapter = _arcadeController.selectedMonth.value;
+
+      return Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          title: Text(
+            chapter?.title ?? 'Arcade',
+            style: const TextStyle(
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+            ),
           ),
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
         ),
-        centerTitle: true,
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Choose Your Month',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                '매달 새로운 스테이지가 열립니다.',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.6),
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Expanded(
-                child: GridView.builder(
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: months.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: 1.0,
+        body: Stack(
+          children: [
+            // 움직이는 네온 배경
+            AnimatedBuilder(
+              animation: _bgAnimation,
+              builder: (context, _) {
+                final double shift = _bgAnimation.value * 0.8;
+                return Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.lerp(const Color(0xFF0D1328),
+                            const Color(0xFF191F41), shift)!,
+                        Color.lerp(const Color(0xFF111B33),
+                            const Color(0xFF0A1124), 1 - shift)!,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                   ),
-                  itemBuilder: (context, index) {
-                    final month = months[index];
-                    final gradient = month['gradient'] as List<Color>;
-                    return _MonthCard(
-                      title: month['name'],
-                      gradient: gradient,
-                      onTap: () {
-                        // 각 월 클릭 시 이동 (예: 1월 스테이지 맵)
-                        Get.toNamed('/arcade/january');
-                      },
-                    );
-                  },
+                );
+              },
+            ),
+            SafeArea(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                child: chapter == null
+                    ? const _EmptySelection()
+                    : _buildStageGrid(context, chapter),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildStageGrid(BuildContext context, ArcadeChapter chapter) {
+    final List<int> stageIds = chapter.stageIds;
+
+    if (stageIds.isEmpty) {
+      return _ComingSoonBanner(title: chapter.title);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${chapter.title} - Stages',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 26,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 0.3,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          '총 ${stageIds.length}개의 스테이지가 기다리고 있어요.',
+          style: const TextStyle(color: Colors.white70, fontSize: 15),
+        ),
+        const SizedBox(height: 22),
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final double maxWidth = constraints.maxWidth;
+              final int crossAxisCount = maxWidth < 460
+                  ? 3
+                  : maxWidth < 760
+                      ? 4
+                      : 5;
+
+              return GridView.builder(
+                physics: const BouncingScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 0.88,
+                ),
+                itemCount: stageIds.length,
+                itemBuilder: (context, index) {
+                  final int stageId = stageIds[index];
+                  final int displayNumber = index + 1;
+                  final StageData? stageData = arcadeStageMap[stageId];
+                  final int starCount =
+                      _arcadeController.starsForStage(stageId);
+                  final bool isAvailable = stageData != null;
+                  final bool unlockedByProgress =
+                      _arcadeController.isStageUnlocked(stageId);
+                  final bool isUnlocked = isAvailable && unlockedByProgress;
+                  final bool isCleared =
+                      isAvailable && _arcadeController.isStageCleared(stageId);
+
+                  return _StageCard(
+                    index: displayNumber,
+                    stars: starCount,
+                    unlocked: isUnlocked,
+                    cleared: isCleared,
+                    onTap: () {
+                      if (!isUnlocked) return;
+                      _arcadeController.selectStage(stageId);
+                      _gameController.isStageCleared.value = false;
+                      _gameController.loadStage(stageData);
+                      Get.toNamed('/arcade/game');
+                    },
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StageCard extends StatefulWidget {
+  final int index;
+  final int stars;
+  final bool unlocked;
+  final bool cleared;
+  final VoidCallback onTap;
+
+  const _StageCard({
+    required this.index,
+    required this.stars,
+    required this.unlocked,
+    required this.cleared,
+    required this.onTap,
+  });
+
+  @override
+  State<_StageCard> createState() => _StageCardState();
+}
+
+class _StageCardState extends State<_StageCard> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color baseColor =
+        widget.unlocked ? const Color(0xFF2E376D) : Colors.grey.shade800;
+    final double opacity = widget.unlocked ? 1 : 0.4;
+
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        if (widget.unlocked) widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 120),
+        scale: _pressed ? 0.97 : 1.0,
+        child: Stack(
+          children: [
+            // 카드 배경
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: baseColor.withOpacity(0.45),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                        color: Colors.white.withOpacity(0.1), width: 1),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blueAccent.withOpacity(0.25 * opacity),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        widget.unlocked
+                            ? Text(
+                                'STAGE',
+                                style: TextStyle(
+                                  color:
+                                      Colors.white.withOpacity(0.8 * opacity),
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
+                                ),
+                              )
+                            : const Icon(Icons.lock_outline_rounded,
+                                color: Colors.white54, size: 26),
+                        const SizedBox(height: 6),
+                        Text(
+                          widget.index.toString().padLeft(2, '0'),
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white.withOpacity(opacity),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(3, (i) {
+                            return Icon(
+                              Icons.star_rounded,
+                              size: 18,
+                              color: i < widget.stars
+                                  ? Colors.amberAccent
+                                  : Colors.white.withOpacity(0.3),
+                            );
+                          }),
+                        ),
+                        if (widget.cleared) ...[
+                          const SizedBox(height: 4),
+                          const Icon(Icons.check_circle_rounded,
+                              color: Colors.lightGreenAccent, size: 20),
+                        ]
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _MonthCard extends StatelessWidget {
-  final String title;
-  final List<Color> gradient;
-  final VoidCallback onTap;
-
-  const _MonthCard({
-    required this.title,
-    required this.gradient,
-    required this.onTap,
-  });
+class _EmptySelection extends StatelessWidget {
+  const _EmptySelection();
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
+    return const Center(
+      child: Text(
+        '월을 선택하면 스테이지를 확인할 수 있어요.',
+        style: TextStyle(color: Colors.white70, fontSize: 16),
+      ),
+    );
+  }
+}
+
+class _ComingSoonBanner extends StatelessWidget {
+  final String title;
+  const _ComingSoonBanner({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
       child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: gradient,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
           borderRadius: BorderRadius.circular(28),
-          boxShadow: [
-            BoxShadow(
-              color: gradient.last.withOpacity(0.35),
-              blurRadius: 12,
-              offset: const Offset(0, 8),
-            ),
-          ],
+          color: Colors.white.withOpacity(0.05),
+          border: Border.all(color: Colors.white.withOpacity(0.1)),
         ),
-        padding: const EdgeInsets.all(20),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              title,
+              '$title 월의 스테이지는 곧 공개됩니다.',
               style: const TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-              ),
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 18),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 4),
-            Text(
-              '20 stages',
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.85),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.play_arrow_rounded,
-                          color: Colors.white, size: 18),
-                      SizedBox(width: 4),
-                      Text(
-                        'Play',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(
-                  Icons.calendar_month_rounded,
-                  color: Colors.white70,
-                ),
-              ],
+            const SizedBox(height: 8),
+            const Text(
+              '조금만 기다려 주세요!',
+              style: TextStyle(color: Colors.white70, fontSize: 14),
             ),
           ],
         ),

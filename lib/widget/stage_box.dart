@@ -1,10 +1,11 @@
+import 'dart:math';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
-class StageBox extends StatelessWidget {
+class StageBox extends StatefulWidget {
   final String label;
   final int stars;
   final bool isUnlocked;
-  final bool isCleared;
   final VoidCallback? onTap;
 
   const StageBox({
@@ -12,94 +13,202 @@ class StageBox extends StatelessWidget {
     required this.label,
     required this.stars,
     required this.isUnlocked,
-    required this.isCleared,
     this.onTap,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final Color baseColor = isUnlocked
-        ? (isCleared ? const Color(0xFF4ECDC4) : const Color(0xFF7B8CFE))
-        : Colors.white24;
-    final Color overlayColor =
-        isUnlocked ? Colors.white.withValues(alpha: 0.08) : Colors.white12;
+  State<StageBox> createState() => _StageBoxState();
+}
 
-    return AnimatedOpacity(
-      duration: const Duration(milliseconds: 200),
-      opacity: isUnlocked ? 1 : 0.6,
-      child: InkWell(
-        onTap: isUnlocked ? onTap : null,
-        borderRadius: BorderRadius.circular(18),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            gradient: LinearGradient(
-              colors: [
-                baseColor,
-                baseColor.withValues(alpha: 0.72),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: baseColor.withValues(alpha: 0.28),
-                blurRadius: 16,
-                offset: const Offset(0, 10),
-              ),
-            ],
-            border: Border.all(
-              color: isCleared
-                  ? Colors.white.withValues(alpha: 0.8)
-                  : Colors.white.withValues(alpha: 0.3),
-              width: isCleared ? 2 : 1,
-            ),
-          ),
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                    color: overlayColor,
+class _StageBoxState extends State<StageBox>
+    with SingleTickerProviderStateMixin {
+  bool _pressed = false;
+  late AnimationController _shakeController;
+
+  @override
+  void initState() {
+    super.initState();
+    _shakeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+    );
+  }
+
+  @override
+  void dispose() {
+    _shakeController.dispose();
+    super.dispose();
+  }
+
+  void _handleTap() {
+    if (widget.isUnlocked) {
+      widget.onTap?.call();
+    } else {
+      _shakeController.forward(from: 0);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final unlocked = widget.isUnlocked;
+    final Color accent =
+        unlocked ? const Color(0xFF6C9BFF) : const Color(0xFF3A3D46);
+
+    return AnimatedBuilder(
+      animation: _shakeController,
+      builder: (context, child) {
+        final double shake = sin(_shakeController.value * pi * 6) * 6;
+        return Transform.translate(offset: Offset(shake, 0), child: child);
+      },
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _pressed = true),
+        onTapUp: (_) {
+          setState(() => _pressed = false);
+          _handleTap();
+        },
+        onTapCancel: () => setState(() => _pressed = false),
+        child: AnimatedScale(
+          scale: _pressed && unlocked ? 0.96 : 1.0,
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeOut,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // 카드 높이에 따라 텍스트 크기 자동 보정
+              final double fontSize = constraints.maxHeight * 0.4;
+
+              return Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  gradient: LinearGradient(
+                    colors: unlocked
+                        ? [accent.withOpacity(0.95), accent.withOpacity(0.6)]
+                        : [accent.withOpacity(0.45), accent.withOpacity(0.25)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(unlocked ? 0.25 : 0.1),
+                    width: 1.2,
+                  ),
+                  boxShadow: unlocked
+                      ? [
+                          BoxShadow(
+                            color: accent.withOpacity(0.35),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ]
+                      : [],
                 ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        CircleAvatar(
-                          radius: 18,
-                          backgroundColor:
-                              Colors.black.withValues(alpha: 0.18),
-                          child: Text(
-                            label,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w900,
-                              fontSize: 14,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: Stack(
+                    children: [
+                      // 유리 느낌
+                      Positioned.fill(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                          child: Container(
+                            color: Colors.white
+                                .withOpacity(unlocked ? 0.05 : 0.04),
+                          ),
+                        ),
+                      ),
+
+                      // 상단 라이트 효과
+                      if (unlocked)
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          height: constraints.maxHeight * 0.25,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.white.withOpacity(0.12),
+                                  Colors.transparent,
+                                ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
                             ),
                           ),
                         ),
-                        Icon(
-                          isUnlocked ? Icons.play_arrow_rounded : Icons.lock,
-                          color: Colors.white.withValues(alpha: 0.9),
-                          size: 20,
+
+                      // 잠금 상태 어둡게
+                      if (!unlocked)
+                        Positioned.fill(
+                          child:
+                              Container(color: Colors.black.withOpacity(0.35)),
                         ),
-                      ],
-                    ),
-                    const Spacer(),
-                    _StarRow(stars: stars, isUnlocked: isUnlocked),
-                  ],
+
+                      // 메인 콘텐츠
+                      Padding(
+                        padding: const EdgeInsets.all(14.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 상단 번호 - 폰트 크기 자동 조정
+                            Expanded(
+                              flex: 3,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  widget.label.padLeft(2, '0'),
+                                  style: TextStyle(
+                                    fontSize: fontSize,
+                                    fontWeight: FontWeight.w900,
+                                    color: unlocked
+                                        ? Colors.white.withOpacity(0.95)
+                                        : Colors.white.withOpacity(0.4),
+                                    letterSpacing: -1,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const Spacer(flex: 1),
+                            _StarRow(stars: widget.stars, isUnlocked: unlocked),
+                          ],
+                        ),
+                      ),
+
+                      // 중앙 자물쇠
+                      if (!unlocked)
+                        const Center(
+                          child: Icon(
+                            Icons.lock_rounded,
+                            color: Colors.white70,
+                            size: 28,
+                          ),
+                        ),
+
+                      // 하단 라인 반사
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: 2,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.white.withOpacity(unlocked ? 0.25 : 0.1),
+                                Colors.transparent,
+                                Colors.white.withOpacity(unlocked ? 0.25 : 0.1),
+                              ],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),
@@ -110,24 +219,28 @@ class StageBox extends StatelessWidget {
 class _StarRow extends StatelessWidget {
   final int stars;
   final bool isUnlocked;
-
   const _StarRow({required this.stars, required this.isUnlocked});
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: List.generate(3, (index) {
-        final bool filled = index < stars;
+      children: List.generate(3, (i) {
+        final filled = i < stars;
         return Padding(
           padding: const EdgeInsets.only(right: 4),
-          child: Icon(
-            filled ? Icons.star_rounded : Icons.star_border_rounded,
-            size: 18,
-            color: filled
-                ? const Color(0xFFFFCF6F)
-                : (isUnlocked
-                    ? Colors.white.withValues(alpha: 0.55)
-                    : Colors.white38),
+          child: AnimatedScale(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutBack,
+            scale: filled ? 1.15 : 1.0,
+            child: Icon(
+              filled ? Icons.star_rounded : Icons.star_border_rounded,
+              size: 18,
+              color: filled
+                  ? const Color(0xFFFFD36E)
+                  : (isUnlocked
+                      ? Colors.white.withOpacity(0.4)
+                      : Colors.white24),
+            ),
           ),
         );
       }),
