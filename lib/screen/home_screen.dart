@@ -19,6 +19,19 @@ class HomeScreen extends StatelessWidget {
     final int maxStars = arcadeStages.length * 3;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const _HomeHeader(),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.lightbulb_outline_rounded,
+                color: Colors.white),
+            onPressed: () => Get.toNamed('/tutorial'),
+          ),
+        ],
+      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -47,7 +60,6 @@ class HomeScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const _HomeHeader(),
                     const SizedBox(height: 20),
                     const Text(
                       '다양한 모드에서 게임을 즐겨보세요.',
