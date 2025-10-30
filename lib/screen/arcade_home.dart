@@ -33,45 +33,21 @@ class ArcadeHomeScreen extends GetView<ArcadeController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-
                 Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final double maxWidth = constraints.maxWidth;
-                      int crossAxisCount = 2;
-                      if (maxWidth >= 1100) {
-                        crossAxisCount = 4;
-                      } else if (maxWidth >= 780) {
-                        crossAxisCount = 3;
-                      }
-                      return Obx(() {
-                        final String? selectedId =
-                            controller.selectedMonth.value?.id;
-                        return GridView.builder(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: crossAxisCount,
-                            crossAxisSpacing: 18,
-                            mainAxisSpacing: 18,
-                            childAspectRatio: 1.1,
-                          ),
-                          itemCount: controller.chapters.length,
-                          itemBuilder: (context, index) {
-                            final ArcadeChapter chapter =
-                                controller.chapters[index];
-                            final bool isSelected = chapter.id == selectedId;
-                            return _MonthCard(
-                              chapter: chapter,
-                              isSelected: isSelected,
-                              onTap: () {
-                                controller.selectMonth(chapter);
-                                controller.refreshProgress();
-                                Get.toNamed('/arcade/stages');
-                              },
-                            );
-                          },
-                        );
-                      });
+                  child: PageView.builder(
+                    controller: PageController(viewportFraction: 0.8),
+                    itemCount: controller.chapters.length,
+                    itemBuilder: (context, index) {
+                      final ArcadeChapter chapter = controller.chapters[index];
+                      return _MonthCard(
+                        chapter: chapter,
+                        isSelected: true, // Always selected in PageView
+                        onTap: () {
+                          controller.selectMonth(chapter);
+                          controller.refreshProgress();
+                          Get.toNamed('/arcade/stages');
+                        },
+                      );
                     },
                   ),
                 ),
