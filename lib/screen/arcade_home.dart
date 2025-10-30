@@ -31,24 +31,9 @@ class ArcadeHomeScreen extends GetView<ArcadeController> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  'Choose Your Month',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                      ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  '매달 새로운 스테이지가 열립니다.',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white70,
-                        fontWeight: FontWeight.w500,
-                      ),
-                ),
-                const SizedBox(height: 24),
+
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
@@ -131,6 +116,7 @@ class _MonthCard extends StatelessWidget {
             children: [
               Text(
                 chapter.title,
+                textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w800,
