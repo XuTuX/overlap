@@ -1,13 +1,9 @@
 import 'package:overlap/enum/bord_enum.dart';
 
+/// 퍼즐 스테이지에 대한 정적 데이터 모델.
+///
+/// Firestore나 Hive 등에 저장하기 위해 JSON <-> 객체 변환 메서드를 함께 제공한다.
 class StageData {
-  final int id;
-  final String title;
-  final int minMoves;
-  final List<List<int>> solutionPattern;
-  final List<String> blockNames;
-  final String? background;
-
   const StageData({
     required this.id,
     required this.title,
@@ -15,9 +11,71 @@ class StageData {
     required this.solutionPattern,
     required this.blockNames,
     this.background,
+    this.order,
   });
+
+  /// 전역에서 고유한 스테이지 식별자.
+  final int id;
+
+  /// UI에 표시될 스테이지 이름.
+  final String title;
+
+  /// 3별 달성을 위한 최소 이동 수.
+  final int minMoves;
+
+  /// 정답 보드를 0/1 그리드로 표현한 값.
+  final List<List<int>> solutionPattern;
+
+  /// 스테이지에서 사용해야 하는 블록 ID 목록.
+  final List<String> blockNames;
+
+  /// 배경 이미지/색상 등의 추가 리소스 키.
+  final String? background;
+
+  /// 챕터 내 정렬 순서를 명시적으로 고정하고 싶을 때 사용.
+  final int? order;
+
+  /// JSON(Map) -> StageData 변환.
+  factory StageData.fromJson(Map<String, dynamic> json) {
+    final pattern = (json['solutionPattern'] as List<dynamic>? ?? const <dynamic>[])
+        .map<List<int>>(
+          (row) => List<int>.from(
+            (row as List<dynamic>).map((value) => (value as num).toInt()),
+            growable: false,
+          ),
+        )
+        .toList(growable: false);
+
+    return StageData(
+      id: (json['id'] as num).toInt(),
+      title: json['title'] as String? ?? '',
+      minMoves: (json['minMoves'] as num).toInt(),
+      solutionPattern: pattern,
+      blockNames: (json['blockNames'] as List<dynamic>? ?? const <dynamic>[])
+          .map((name) => name.toString())
+          .toList(growable: false),
+      background: json['background'] as String?,
+      order: json['order'] == null ? null : (json['order'] as num).toInt(),
+    );
+  }
+
+  /// StageData -> JSON(Map) 변환.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'title': title,
+      'minMoves': minMoves,
+      'solutionPattern': solutionPattern
+          .map((row) => row.toList(growable: false))
+          .toList(growable: false),
+      'blockNames': blockNames.toList(growable: false),
+      if (background != null) 'background': background,
+      if (order != null) 'order': order,
+    };
+  }
 }
 
+/// 0/1 패턴을 게임 보드에 필요한 셀 리스트로 변환한다.
 List<Cellstate> patternToCells(List<List<int>> pattern) {
   final flattened = <Cellstate>[];
   for (final row in pattern) {
@@ -27,270 +85,3 @@ List<Cellstate> patternToCells(List<List<int>> pattern) {
   }
   return flattened;
 }
-
-final List<StageData> arcadeStages = [
-  StageData(
-    id: 1,
-    title: 'Stage 1: Spark',
-    minMoves: 3,
-    blockNames: ['O', 'T'],
-    solutionPattern: [
-      [0, 1, 1, 1, 0],
-      [0, 1, 1, 1, 0],
-      [0, 0, 1, 0, 0],
-      [0, 0, 1, 0, 0],
-      [0, 0, 0, 0, 0],
-    ],
-  ),
-  StageData(
-    id: 2,
-    title: 'Stage 2: Bridge',
-    minMoves: 4,
-    blockNames: ['O', 'S'],
-    solutionPattern: [
-      [1, 1, 0, 1, 1],
-      [1, 1, 0, 1, 1],
-      [0, 0, 0, 0, 0],
-      [0, 1, 1, 1, 0],
-      [0, 0, 1, 0, 0],
-    ],
-  ),
-  StageData(
-    id: 3,
-    title: 'Stage 3: Arrow',
-    minMoves: 4,
-    blockNames: ['T', 'J'],
-    solutionPattern: [
-      [0, 1, 0, 1, 0],
-      [0, 1, 1, 1, 0],
-      [1, 1, 1, 1, 1],
-      [0, 1, 1, 1, 0],
-      [0, 1, 0, 1, 0],
-    ],
-  ),
-  StageData(
-    id: 4,
-    title: 'Stage 4: Steps',
-    minMoves: 5,
-    blockNames: ['L', 'O'],
-    solutionPattern: [
-      [1, 0, 0, 0, 0],
-      [1, 1, 0, 0, 0],
-      [0, 1, 1, 0, 0],
-      [0, 0, 1, 1, 0],
-      [0, 0, 0, 1, 1],
-    ],
-  ),
-  StageData(
-    id: 5,
-    title: 'Stage 5: Pulse',
-    minMoves: 5,
-    blockNames: ['T', 'O', 'S', 'Z'],
-    solutionPattern: [
-      [0, 1, 1, 1, 0],
-      [1, 1, 1, 1, 1],
-      [0, 1, 1, 1, 0],
-      [0, 0, 1, 0, 0],
-      [0, 0, 1, 0, 0],
-    ],
-  ),
-  StageData(
-    id: 6,
-    title: 'Stage 6: Fork',
-    minMoves: 5,
-    blockNames: ['T', 'L', 'J', 'O'],
-    solutionPattern: [
-      [0, 1, 0, 1, 0],
-      [1, 1, 1, 1, 1],
-      [0, 1, 1, 1, 0],
-      [0, 1, 0, 1, 0],
-      [0, 1, 0, 1, 0],
-    ],
-  ),
-  StageData(
-    id: 7,
-    title: 'Stage 7: Spiral',
-    minMoves: 6,
-    blockNames: ['S', 'Z', 'L', 'J', 'T', 'O'],
-    solutionPattern: [
-      [1, 1, 1, 1, 1],
-      [1, 0, 0, 0, 1],
-      [1, 1, 1, 0, 1],
-      [1, 0, 1, 1, 1],
-      [1, 0, 0, 0, 0],
-    ],
-  ),
-  StageData(
-    id: 8,
-    title: 'Stage 8: Shield',
-    minMoves: 6,
-    blockNames: ['O', 'T', 'J', 'L', 'S', 'Z'],
-    solutionPattern: [
-      [0, 1, 1, 1, 0],
-      [1, 1, 1, 1, 1],
-      [1, 1, 0, 1, 1],
-      [0, 1, 0, 1, 0],
-      [0, 1, 0, 1, 0],
-    ],
-  ),
-  StageData(
-    id: 9,
-    title: 'Stage 9: Gateway',
-    minMoves: 6,
-    blockNames: ['L', 'J', 'T', 'O', 'S'],
-    solutionPattern: [
-      [1, 1, 0, 1, 1],
-      [1, 1, 0, 1, 1],
-      [1, 1, 0, 1, 1],
-      [0, 1, 0, 1, 0],
-      [0, 1, 1, 1, 0],
-    ],
-  ),
-  StageData(
-    id: 10,
-    title: 'Stage 10: Cascade',
-    minMoves: 6,
-    blockNames: ['L', 'J', 'S', 'Z', 'T', 'O'],
-    solutionPattern: [
-      [0, 0, 1, 1, 1],
-      [0, 1, 1, 1, 0],
-      [1, 1, 1, 0, 0],
-      [1, 1, 0, 0, 0],
-      [1, 0, 0, 0, 0],
-    ],
-  ),
-  StageData(
-    id: 11,
-    title: 'Stage 11: Twin',
-    minMoves: 7,
-    blockNames: ['O', 'T', 'S', 'Z', 'L', 'J'],
-    solutionPattern: [
-      [1, 0, 0, 0, 1],
-      [1, 1, 0, 1, 1],
-      [1, 1, 1, 1, 1],
-      [1, 1, 0, 1, 1],
-      [1, 0, 0, 0, 1],
-    ],
-  ),
-  StageData(
-    id: 12,
-    title: 'Stage 12: Comet',
-    minMoves: 7,
-    blockNames: ['S', 'Z', 'T', 'L', 'J', 'O'],
-    solutionPattern: [
-      [0, 0, 1, 0, 0],
-      [0, 1, 1, 1, 0],
-      [1, 1, 1, 1, 1],
-      [0, 1, 1, 1, 0],
-      [0, 0, 1, 0, 0],
-    ],
-  ),
-  StageData(
-    id: 13,
-    title: 'Stage 13: Prism',
-    minMoves: 7,
-    blockNames: ['T', 'O', 'L', 'J', 'S', 'Z'],
-    solutionPattern: [
-      [0, 1, 1, 1, 0],
-      [1, 1, 0, 1, 1],
-      [1, 1, 0, 1, 1],
-      [1, 1, 1, 1, 1],
-      [0, 1, 0, 1, 0],
-    ],
-  ),
-  StageData(
-    id: 14,
-    title: 'Stage 14: Labyrinth',
-    minMoves: 8,
-    blockNames: ['L', 'J', 'T', 'S', 'Z', 'O'],
-    solutionPattern: [
-      [1, 1, 1, 1, 1],
-      [1, 0, 0, 0, 1],
-      [1, 1, 1, 0, 1],
-      [1, 0, 1, 1, 1],
-      [1, 0, 0, 0, 1],
-    ],
-  ),
-  StageData(
-    id: 15,
-    title: 'Stage 15: Crown',
-    minMoves: 8,
-    blockNames: ['T', 'L', 'J', 'O', 'S', 'Z'],
-    solutionPattern: [
-      [0, 1, 0, 1, 0],
-      [1, 1, 1, 1, 1],
-      [1, 1, 0, 1, 1],
-      [0, 1, 1, 1, 0],
-      [0, 0, 1, 0, 0],
-    ],
-  ),
-  StageData(
-    id: 16,
-    title: 'Stage 16: Nebula',
-    minMoves: 8,
-    blockNames: ['T', 'S', 'Z', 'L', 'J', 'O'],
-    solutionPattern: [
-      [1, 1, 1, 1, 1],
-      [1, 1, 0, 1, 1],
-      [0, 1, 1, 1, 0],
-      [0, 1, 1, 1, 0],
-      [1, 1, 0, 1, 1],
-    ],
-  ),
-  StageData(
-    id: 17,
-    title: 'Stage 17: Hive',
-    minMoves: 9,
-    blockNames: ['O', 'L', 'J', 'T', 'S', 'Z'],
-    solutionPattern: [
-      [0, 1, 1, 1, 0],
-      [1, 1, 0, 1, 1],
-      [1, 0, 0, 0, 1],
-      [1, 1, 0, 1, 1],
-      [0, 1, 1, 1, 0],
-    ],
-  ),
-  StageData(
-    id: 18,
-    title: 'Stage 18: Vortex',
-    minMoves: 9,
-    blockNames: ['L', 'J', 'S', 'Z', 'T', 'O'],
-    solutionPattern: [
-      [1, 1, 1, 1, 1],
-      [1, 0, 0, 0, 1],
-      [1, 0, 1, 0, 1],
-      [1, 0, 1, 0, 1],
-      [1, 1, 1, 1, 1],
-    ],
-  ),
-  StageData(
-    id: 19,
-    title: 'Stage 19: Halo',
-    minMoves: 9,
-    blockNames: ['T', 'L', 'J', 'O', 'S', 'Z'],
-    solutionPattern: [
-      [0, 1, 1, 1, 0],
-      [1, 1, 0, 1, 1],
-      [1, 1, 0, 1, 1],
-      [1, 1, 0, 1, 1],
-      [0, 1, 1, 1, 0],
-    ],
-  ),
-  StageData(
-    id: 20,
-    title: 'Stage 20: Heartcore',
-    minMoves: 10,
-    blockNames: ['O', 'T', 'L', 'J', 'S', 'Z'],
-    solutionPattern: [
-      [0, 1, 1, 1, 0],
-      [1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1],
-      [0, 1, 1, 1, 0],
-      [0, 0, 1, 0, 0],
-    ],
-  ),
-];
-
-final Map<int, StageData> arcadeStageMap = {
-  for (final stage in arcadeStages) stage.id: stage,
-};

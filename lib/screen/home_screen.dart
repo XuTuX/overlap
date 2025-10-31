@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:overlap/models/arcade_stage_data.dart';
 import 'package:overlap/models/hive_game_box.dart';
-import 'package:overlap/models/stage_data.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -23,7 +23,15 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const _HomeHeader(),
+        title: const Text(
+          'Overlap Puzzle',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+            letterSpacing: 0.6,
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.lightbulb_outline_rounded,
@@ -60,7 +68,7 @@ class HomeScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     const Text(
                       '다양한 모드에서 게임을 즐겨보세요.',
                       style: TextStyle(
@@ -69,7 +77,7 @@ class HomeScreen extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 10),
 
                     // 📦 모드 카드
                     Expanded(
@@ -137,40 +145,6 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _HomeHeader extends StatelessWidget {
-  const _HomeHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const Text(
-          'Overlap Puzzle',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-            letterSpacing: 0.6,
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Icon(
-            Icons.videogame_asset_rounded,
-            color: Colors.white,
-            size: 26,
-          ),
-        ),
-      ],
     );
   }
 }

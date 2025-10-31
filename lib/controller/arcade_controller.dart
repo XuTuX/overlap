@@ -1,6 +1,10 @@
 import 'package:get/get.dart';
 import 'package:overlap/models/arcade_chapter.dart';
+import 'package:overlap/models/arcade_stage_data.dart';
 import 'package:overlap/models/hive_game_box.dart';
+
+final List<ArcadeChapter> _availableChapters =
+    arcadeChapters.where((chapter) => chapter.stageCount > 0).toList(growable: false);
 
 class ArcadeController extends GetxController {
   ArcadeController({HiveGameBox? hiveGameBox})
@@ -15,7 +19,7 @@ class ArcadeController extends GetxController {
   final RxMap<int, int> stageStars = <int, int>{}.obs;
   final RxInt clearedStage = 0.obs;
 
-  List<ArcadeChapter> get chapters => arcadeChapters;
+  List<ArcadeChapter> get chapters => _availableChapters;
 
   static HiveGameBox? _tryCreateHiveGameBox() {
     try {

@@ -96,11 +96,11 @@ class _ArcadeStageListScreenState extends State<ArcadeStageListScreen>
   }
 
   Widget _buildStageGrid(BuildContext context, ArcadeChapter chapter) {
-    final List<int> stageIds = chapter.stageIds;
-
-    if (stageIds.isEmpty) {
+    final List<StageData> stages = chapter.stages;
+    if (stages.isEmpty) {
       return _ComingSoonBanner(title: chapter.title);
     }
+    final int totalSlots = chapter.totalStageSlots;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +116,9 @@ class _ArcadeStageListScreenState extends State<ArcadeStageListScreen>
         ),
         const SizedBox(height: 6),
         Text(
-          '총 ${stageIds.length}개의 스테이지가 기다리고 있어요.',
+          totalSlots == stages.length
+              ? '총 ${stages.length}개의 스테이지가 기다리고 있어요.'
+              : '총 $totalSlots개 중 ${stages.length}개의 스테이지가 공개되었어요.',
           style: const TextStyle(color: Colors.white70, fontSize: 15),
         ),
         const SizedBox(height: 22),
@@ -138,19 +140,20 @@ class _ArcadeStageListScreenState extends State<ArcadeStageListScreen>
                   mainAxisSpacing: 16,
                   childAspectRatio: 0.88,
                 ),
-                itemCount: stageIds.length,
+                itemCount: totalSlots,
                 itemBuilder: (context, index) {
-                  final int stageId = stageIds[index];
-                  final int displayNumber = index + 1;
-                  final StageData? stageData = arcadeStageMap[stageId];
-                  final int starCount =
-                      _arcadeController.starsForStage(stageId);
-                  final bool isAvailable = stageData != null;
-                  final bool unlockedByProgress =
+                  final StageData? stageData =
+                      index < stages.length ? stages[index] : null;
+                  final int? stageId = stageData?.id;
+                  final int displayNumber =
+                      stageData?.order ?? index + 1;
+                  final int starCount = stageId == null
+                      ? 0
+                      : _arcadeController.starsForStage(stageId);
+                  final bool isUnlocked = stageId != null &&
                       _arcadeController.isStageUnlocked(stageId);
-                  final bool isUnlocked = isAvailable && unlockedByProgress;
                   final bool isCleared =
-                      isAvailable && _arcadeController.isStageCleared(stageId);
+                      stageId != null && _arcadeController.isStageCleared(stageId);
 
                   return _StageCard(
                     index: displayNumber,
@@ -158,8 +161,9 @@ class _ArcadeStageListScreenState extends State<ArcadeStageListScreen>
                     unlocked: isUnlocked,
                     cleared: isCleared,
                     onTap: () {
-                      if (!isUnlocked) return;
-                      _arcadeController.selectStage(stageId);
+                      if (!isUnlocked || stageData == null) return;
+                      final int safeStageId = stageData.id;
+                      _arcadeController.selectStage(safeStageId);
                       _gameController.isStageCleared.value = false;
                       _gameController.loadStage(stageData);
                       Get.toNamed('/arcade/game');
