@@ -146,10 +146,8 @@ class _GameScreenState extends State<GameScreen> {
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 SizedBox(
-                                                  height: math.min(
-                                                    metrics.cellHeight * 2,
-                                                    40 * metrics.scale,
-                                                  ),
+                                                  height:
+                                                      metrics.scaledPadding(12),
                                                 ),
                                                 Row(
                                                   mainAxisAlignment:
@@ -158,11 +156,11 @@ class _GameScreenState extends State<GameScreen> {
                                                   children: [
                                                     Container(
                                                       margin: EdgeInsets.all(
-                                                          metrics.scaledPadding(
-                                                              10)),
+                                                          metrics
+                                                              .scaledPadding(6)),
                                                       padding: EdgeInsets.all(
-                                                          metrics.scaledPadding(
-                                                              10)),
+                                                          metrics
+                                                              .scaledPadding(6)),
                                                       decoration: BoxDecoration(
                                                         borderRadius:
                                                             BorderRadius
@@ -210,13 +208,10 @@ class _GameScreenState extends State<GameScreen> {
                                                         .retryStorage,
                                                   ),
                                                 SizedBox(
-                                                  height: hasWarning
-                                                      ? math.min(
-                                                          metrics.cellHeight *
-                                                              0.75,
-                                                          16 * metrics.scale,
-                                                        )
-                                                      : metrics.cellHeight,
+                                                  height: metrics
+                                                      .scaledPadding(
+                                                    hasWarning ? 10 : 16,
+                                                  ),
                                                 ),
                                               ],
                                             ),

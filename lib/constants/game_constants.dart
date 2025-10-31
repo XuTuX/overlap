@@ -190,7 +190,7 @@ class GameLayoutMetrics {
 
   double get boardCellSize => boardSize / GameConfig.columns;
   double get solveCellSize => solveBoardSize / GameConfig.columns;
-  double get blockBoxSize => boardSize * 0.56;
+  double get blockBoxSize => boardSize * 0.52;
   double get mainTextSize => (isTablet ? 45 : 30) * scale;
   double get scoreTextSize => (isTablet ? 36 : 24) * scale;
   double get highScoreTextSize => (isTablet ? 30 : 20) * scale;
@@ -198,15 +198,15 @@ class GameLayoutMetrics {
   double get gameOverIconSize => (isTablet ? 45 : 32) * scale;
   double get rotateIconSize => (isTablet ? 36 : 24) * scale;
   double get boardToToolbarSpacing =>
-      max(_boardToRackSpacingBase * 0.5, 6.0 * scale);
+      max(_boardToRackSpacingBase * 0.3, 4.0 * scale);
 
   double dragTopPadding({required bool hasWarning}) {
-    final double base = _boardToRackSpacingBase;
+    final double base = _boardToRackSpacingBase * 0.75;
     if (!hasWarning) {
-      return base;
+      return max(base, 6.0 * scale);
     }
     final double reduced = base * GameConfig.boardToRackWarningFactor;
-    return max(reduced, 8.0 * scale);
+    return max(reduced, 6.0 * scale);
   }
 
   GameLayoutMetrics scaled(double factor) {
@@ -224,13 +224,14 @@ class GameLayoutMetrics {
   }
 
   double estimatedVerticalFootprint({required bool hasWarning}) {
-    final double topSpacing = min(cellHeight * 2, 40 * scale);
+    final double topSpacing = scaledPadding(12);
     final double timerHeight = timerSize + scaledPadding(40);
     final double solveHeight = solveBoardSize;
     final double headerHeight = max(timerHeight, solveHeight);
-    final double spacingAfterHeader = cellHeight;
-    final double warningSpacing =
-        hasWarning ? min(cellHeight * 0.75, 16 * scale) : cellHeight;
+    final double spacingAfterHeader = hasWarning
+        ? scaledPadding(10)
+        : scaledPadding(16);
+    final double warningSpacing = hasWarning ? scaledPadding(8) : 0.0;
     final double bannerHeight = hasWarning ? scaledPadding(72) : 0.0;
     final double boardHeight = boardSize * 1.1;
     final double spacingAfterBoard = boardToToolbarSpacing;
@@ -311,12 +312,13 @@ class GameLayoutMetrics {
   }
 
   double _headerSectionFootprint({required bool hasWarning}) {
-    final double topSpacing = min(cellHeight * 2, 40 * scale);
+    final double topSpacing = scaledPadding(12);
     final double headerHeight =
         max(timerSize + scaledPadding(40), solveBoardSize);
-    final double spacingAfterHeader = cellHeight;
-    final double warningSpacing =
-        hasWarning ? min(cellHeight * 0.75, 16 * scale) : cellHeight;
+    final double spacingAfterHeader = hasWarning
+        ? scaledPadding(10)
+        : scaledPadding(16);
+    final double warningSpacing = hasWarning ? scaledPadding(8) : 0.0;
     final double bannerHeight = hasWarning ? scaledPadding(72) : 0.0;
     return topSpacing +
         headerHeight +
