@@ -1,6 +1,6 @@
-import 'package:overlap/constants/app_colors.dart';
-import 'package:overlap/constants/game_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:overlap/constants/app_colors.dart';
+import 'package:overlap/widgets/game_layout_scope.dart';
 
 class ScoreWidget extends StatelessWidget {
   final double score;
@@ -10,7 +10,7 @@ class ScoreWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final metrics = GameConfig.layoutOf(context);
+    final metrics = GameLayoutScope.of(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [

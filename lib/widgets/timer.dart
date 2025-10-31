@@ -1,10 +1,10 @@
 // circular_timer_view.dart
-import 'package:overlap/constants/app_colors.dart';
-import 'package:overlap/constants/game_constants.dart';
-import 'package:overlap/controllers/game_controller.dart';
-import 'package:overlap/controllers/timer_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:overlap/constants/app_colors.dart';
+import 'package:overlap/controllers/game_controller.dart';
+import 'package:overlap/controllers/timer_controller.dart';
+import 'package:overlap/widgets/game_layout_scope.dart';
 
 class CircularTimer extends StatelessWidget {
   CircularTimer({super.key});
@@ -14,7 +14,7 @@ class CircularTimer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final metrics = GameConfig.layoutOf(context);
+    final metrics = GameLayoutScope.of(context);
     return Center(
       child: Obx(() => TweenAnimationBuilder<Duration>(
             key: ValueKey(timerController.restartCounter.value),
@@ -50,24 +50,26 @@ class CircularTimer extends StatelessWidget {
                                   ? AppColors.accentTertiary
                                   : AppColors.accent)
                               .withFraction(0.45),
-                          blurRadius: 18,
-                          offset: const Offset(0, 6),
+                          blurRadius: 18 * metrics.scale,
+                          offset: Offset(0, 6 * metrics.scale),
                         ),
                       ],
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.all(12.0),
+                      padding:
+                          EdgeInsets.all(metrics.scaledPadding(12)),
                       child: DecoratedBox(
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           color: AppColors.surface,
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding:
+                              EdgeInsets.all(metrics.scaledPadding(8)),
                           child: CircularProgressIndicator(
                             value:
                                 1 - (seconds / timerController.duration.value),
-                            strokeWidth: 11.0,
+                            strokeWidth: 11.0 * metrics.scale,
                             backgroundColor:
                                 AppColors.surfaceAlt.withFraction(0.6),
                             valueColor: AlwaysStoppedAnimation<Color>(
@@ -82,8 +84,8 @@ class CircularTimer extends StatelessWidget {
                   ),
                   Text(
                     seconds.toStringAsFixed(1),
-                    style: const TextStyle(
-                      fontSize: 24.0,
+                    style: TextStyle(
+                      fontSize: 24.0 * metrics.scale,
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.w700,
                     ),

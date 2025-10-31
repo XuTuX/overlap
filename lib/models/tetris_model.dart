@@ -1,6 +1,8 @@
-import 'package:overlap/constants/app_colors.dart';
-import 'package:overlap/constants/game_constants.dart';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:overlap/constants/app_colors.dart';
+import 'package:overlap/widgets/game_layout_scope.dart';
 
 class TetrisModel extends StatelessWidget {
   final List<Offset> blockList;
@@ -8,46 +10,66 @@ class TetrisModel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const double cellSpacing = 1.0;
-    final metrics = GameConfig.layoutOf(context);
+    final metrics = GameLayoutScope.of(context);
+    final double gap = math.max(0.6, 1.0 * metrics.scale);
 
-    final double minX =
-        blockList.map((e) => e.dx).reduce((a, b) => a < b ? a : b);
-    final double minY =
-        blockList.map((e) => e.dy).reduce((a, b) => a < b ? a : b);
+    final double minX = blockList.map((e) => e.dx).reduce(math.min);
+    final double maxX = blockList.map((e) => e.dx).reduce(math.max);
+    final double minY = blockList.map((e) => e.dy).reduce(math.min);
+    final double maxY = blockList.map((e) => e.dy).reduce(math.max);
 
-    return Container(
-      decoration: BoxDecoration(border: Border.all(color: Colors.transparent)),
-      width: metrics.blockBoxSize + 4,
-      height: metrics.blockBoxSize + 4,
-      child: Stack(
-        children: blockList.map((offset) {
-          final offsetX = offset.dx - minX;
-          final offsetY = offset.dy - minY;
-          return Positioned(
-            left: offsetX * (metrics.boardCellSize + cellSpacing),
-            top: offsetY * (metrics.boardCellSize + cellSpacing),
-            child: Container(
-              width: (metrics.boardCellSize - cellSpacing * 2),
-              height: (metrics.boardCellSize - cellSpacing * 2),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                gradient: LinearGradient(
-                  colors: AppColors.highlightGradient,
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.accent.withFraction(0.45),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
+    final int widthCells = (maxX - minX).abs().toInt() + 1;
+    final int heightCells = (maxY - minY).abs().toInt() + 1;
+
+    final double rawCellSize = metrics.boardCellSize - gap * 2;
+    final double cellSize = math.max(6.0, rawCellSize);
+
+    final double blockWidth = widthCells * (cellSize + gap) + gap;
+    final double blockHeight = heightCells * (cellSize + gap) + gap;
+
+    final double containerSide =
+        metrics.blockBoxSize + metrics.scaledPadding(4);
+
+    return SizedBox(
+      width: containerSide,
+      height: containerSide,
+      child: Center(
+        child: SizedBox(
+          width: blockWidth,
+          height: blockHeight,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: blockList.map((offset) {
+              final double offsetX = offset.dx - minX;
+              final double offsetY = offset.dy - minY;
+              return Positioned(
+                left: gap + offsetX * (cellSize + gap),
+                top: gap + offsetY * (cellSize + gap),
+                child: Container(
+                  width: cellSize,
+                  height: cellSize,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(
+                      math.max(6, 12 * metrics.scale),
+                    ),
+                    gradient: LinearGradient(
+                      colors: AppColors.highlightGradient,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.accent.withFraction(0.45),
+                        blurRadius: 12 * metrics.scale,
+                        offset: Offset(0, 4 * metrics.scale),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          );
-        }).toList(),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
       ),
     );
   }

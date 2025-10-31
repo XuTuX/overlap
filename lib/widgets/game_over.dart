@@ -1,8 +1,8 @@
-import 'package:overlap/constants/app_colors.dart';
-import 'package:overlap/constants/game_constants.dart';
-import 'package:overlap/controllers/game_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:overlap/constants/app_colors.dart';
+import 'package:overlap/controllers/game_controller.dart';
+import 'package:overlap/widgets/game_layout_scope.dart';
 
 class Gameover extends StatelessWidget {
   const Gameover({super.key});
@@ -10,7 +10,7 @@ class Gameover extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GameController gameController = Get.find<GameController>();
-    final metrics = GameConfig.layoutOf(context);
+    final metrics = GameLayoutScope.of(context);
     return Column(
       children: [
         Text(
