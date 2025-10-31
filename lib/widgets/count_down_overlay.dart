@@ -10,7 +10,7 @@ class CountdownOverlay extends StatefulWidget {
 }
 
 class _CountdownOverlayState extends State<CountdownOverlay> {
-  int countdown = DURATION; // 3초 카운트다운;
+  int countdown = GameConfig.countdownDelay.inSeconds; // 3초 카운트다운;
 
   @override
   void initState() {

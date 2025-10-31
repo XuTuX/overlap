@@ -10,12 +10,13 @@ class Gameover extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GameController gameController = Get.find<GameController>();
+    final metrics = GameConfig.layoutOf(context);
     return Column(
       children: [
         Text(
           'Game over',
           style: TextStyle(
-            fontSize: ResponsiveSizes.gameOverTextSize(),
+            fontSize: metrics.gameOverTextSize,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
             letterSpacing: 1.2,
@@ -33,7 +34,7 @@ class Gameover extends StatelessWidget {
               },
               icon: Icon(
                 Icons.home_rounded,
-                size: ResponsiveSizes.gameOverIconSize(),
+                size: metrics.gameOverIconSize,
                 color: AppColors.accent,
               ),
             ),
@@ -41,7 +42,7 @@ class Gameover extends StatelessWidget {
               onPressed: gameController.resetGame,
               icon: Icon(
                 Icons.replay_rounded,
-                size: ResponsiveSizes.gameOverIconSize(),
+                size: metrics.gameOverIconSize,
                 color: AppColors.accentSecondary,
               ),
             ),

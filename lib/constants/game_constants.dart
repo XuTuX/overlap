@@ -1,99 +1,129 @@
-import 'dart:ui';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-const double kTabletBreakpoint = 768.0;
+class GameConfig {
+  GameConfig._();
 
-// 가령 세로, 가로의 Breakpoint를 다르게 잡아서 (예: 600, 900) 좀 더 정교하게 구분할 수도 있음
-// ex) if (Get.width > 900 && Get.height > 600) { ... } else { ... }
+  static const double tabletBreakpoint = 768.0;
+  static const int columns = 5;
+  static const int rows = 5;
+  static const double blockPivot = 1.0;
+  static const int availableBlockCount = 2;
+  static const Duration countdownDelay = Duration(seconds: 2);
 
-class ResponsiveSizes {
-  static const double kTabletBreakpoint = 768.0;
+  static const Map<String, List<Offset>> blockShapes = {
+    'O': [
+      Offset.zero,
+      Offset(1, 0),
+      Offset(1, 1),
+      Offset(0, 1),
+    ],
+    '0': [
+      Offset.zero,
+      Offset(1, 0),
+      Offset(1, 1),
+      Offset(0, 1),
+    ],
+    'T': [
+      Offset.zero,
+      Offset(1, 0),
+      Offset(2, 0),
+      Offset(1, 1),
+    ],
+    'L': [
+      Offset.zero,
+      Offset(0, 1),
+      Offset(0, 2),
+      Offset(1, 2),
+    ],
+    'J': [
+      Offset(1, 0),
+      Offset(1, 1),
+      Offset(1, 2),
+      Offset(0, 2),
+    ],
+    'S': [
+      Offset(1, 0),
+      Offset(2, 0),
+      Offset(0, 1),
+      Offset(1, 1),
+    ],
+    'Z': [
+      Offset.zero,
+      Offset(1, 0),
+      Offset(1, 1),
+      Offset(2, 1),
+    ],
+  };
 
-  static double getBoardSize() =>
-      Get.width >= kTabletBreakpoint ? Get.width * 0.35 : Get.width * 0.5;
+  static GameLayoutMetrics layoutOf(BuildContext context) {
+    final mediaQuery = MediaQuery.sizeOf(context);
+    final orientation = MediaQuery.orientationOf(context);
+    final bool isTablet = mediaQuery.shortestSide >= tabletBreakpoint;
 
-  static double getSolveSize() =>
-      Get.width >= kTabletBreakpoint ? Get.width * 0.19 : Get.width * 0.28;
+    final double availableWidth = orientation == Orientation.landscape
+        ? mediaQuery.height
+        : mediaQuery.width;
+    final double fallbackWidth = min(mediaQuery.width, mediaQuery.height);
+    final double widthForLayout = max(availableWidth, fallbackWidth);
 
-  static double cellHeight() =>
-      Get.width >= kTabletBreakpoint ? Get.height * 0.02 : Get.height * 0.01;
+    final double maxBoardSize =
+        max(min(widthForLayout, mediaQuery.width) - 32, 200);
+    final double boardCandidate =
+        (isTablet ? mediaQuery.width * 0.35 : mediaQuery.width * 0.5)
+            .clamp(180, maxBoardSize)
+            .toDouble();
+    final double boardSize = min(boardCandidate, maxBoardSize);
 
-  static double timerSize() =>
-      Get.width >= kTabletBreakpoint ? Get.width * 0.15 : Get.width * 0.25;
+    final double solveCandidate =
+        (isTablet ? mediaQuery.width * 0.19 : mediaQuery.width * 0.28)
+            .clamp(140.0, boardSize * 0.8)
+            .toDouble();
+    final double timerCandidate =
+        (isTablet ? mediaQuery.width * 0.15 : mediaQuery.width * 0.25)
+            .clamp(120.0, boardSize)
+            .toDouble();
+    final double cellHeight =
+        (isTablet ? mediaQuery.height * 0.02 : mediaQuery.height * 0.01)
+            .clamp(12.0, 32.0)
+            .toDouble();
 
-  static double mainTextSize() => Get.width >= kTabletBreakpoint ? 45 : 30;
-
-  static double scoreTextSize() => Get.width >= kTabletBreakpoint ? 36 : 24;
-
-  static double highScoreTextSize() => Get.width >= kTabletBreakpoint ? 30 : 20;
-
-  static double gameOverTextSize() => Get.width >= kTabletBreakpoint ? 45 : 32;
-
-  static double gameOverIconSize() => Get.width >= kTabletBreakpoint ? 45 : 32;
-
-  static double rotateIconSize() => Get.width >= kTabletBreakpoint ? 36 : 24;
+    return GameLayoutMetrics(
+      screenSize: mediaQuery,
+      isTablet: isTablet,
+      boardSize: boardSize,
+      solveBoardSize: solveCandidate,
+      cellHeight: cellHeight,
+      timerSize: timerCandidate,
+    );
+  }
 }
 
-double BOARD_SIZE = ResponsiveSizes.getBoardSize();
-double BOARD_CELL_SIZE = BOARD_SIZE / ROW;
+class GameLayoutMetrics {
+  const GameLayoutMetrics({
+    required this.screenSize,
+    required this.isTablet,
+    required this.boardSize,
+    required this.solveBoardSize,
+    required this.cellHeight,
+    required this.timerSize,
+  });
 
-double SOLVE_SIZE = ResponsiveSizes.getSolveSize();
-double SOLVE_CELL_SIZE = SOLVE_SIZE / COL;
+  final Size screenSize;
+  final bool isTablet;
+  final double boardSize;
+  final double solveBoardSize;
+  final double cellHeight;
+  final double timerSize;
 
-double BLOCK_BOX_SIZE = BOARD_SIZE * (3 / 5);
-
-double CELL_HEIGHT = ResponsiveSizes.cellHeight();
-
-double TIMER_SIZE = ResponsiveSizes.timerSize();
-
-const int COL = 5;
-const int ROW = 5;
-const double CENTER_POINT = 1.0;
-int BLOCK_LIST_COUNTS = 2;
-int DURATION = 2;
-
-Map<String, List<Offset>> blockShapes = {
-  'O': [
-    Offset(0, 0),
-    Offset(1, 0),
-    Offset(1, 1),
-    Offset(0, 1),
-  ],
-  '0': [
-    Offset(0, 0),
-    Offset(1, 0),
-    Offset(1, 1),
-    Offset(0, 1),
-  ],
-  'T': [
-    Offset(0, 0),
-    Offset(1, 0),
-    Offset(2, 0),
-    Offset(1, 1),
-  ],
-  'L': [
-    Offset(0, 0),
-    Offset(0, 1),
-    Offset(0, 2),
-    Offset(1, 2),
-  ],
-  'J': [
-    Offset(1, 0),
-    Offset(1, 1),
-    Offset(1, 2),
-    Offset(0, 2),
-  ],
-  'S': [
-    Offset(1, 0),
-    Offset(2, 0),
-    Offset(0, 1),
-    Offset(1, 1),
-  ],
-  'Z': [
-    Offset(0, 0),
-    Offset(1, 0),
-    Offset(1, 1),
-    Offset(2, 1),
-  ],
-};
+  double get boardCellSize => boardSize / GameConfig.columns;
+  double get solveCellSize => solveBoardSize / GameConfig.columns;
+  double get blockBoxSize => boardSize * 0.6;
+  double get mainTextSize => isTablet ? 45 : 30;
+  double get scoreTextSize => isTablet ? 36 : 24;
+  double get highScoreTextSize => isTablet ? 30 : 20;
+  double get gameOverTextSize => isTablet ? 45 : 32;
+  double get gameOverIconSize => isTablet ? 45 : 32;
+  double get rotateIconSize => isTablet ? 36 : 24;
+}

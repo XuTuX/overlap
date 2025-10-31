@@ -10,7 +10,9 @@ class ArcadeGameBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ArcadeGameController gameController = Get.find<ArcadeGameController>();
+    final ArcadeGameController gameController =
+        Get.find<ArcadeGameController>();
+    final metrics = GameConfig.layoutOf(context);
     return Center(
       child: Obx(() {
         Color boardColor;
@@ -24,8 +26,8 @@ class ArcadeGameBoard extends StatelessWidget {
         return AnimatedContainer(
           duration: const Duration(seconds: 1),
           curve: Curves.easeInOut,
-          height: (BOARD_SIZE * 1.1),
-          width: (BOARD_SIZE * 1.1),
+          height: metrics.boardSize * 1.1,
+          width: metrics.boardSize * 1.1,
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
@@ -47,12 +49,12 @@ class ArcadeGameBoard extends StatelessWidget {
             key: gameController.gridKey,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               mainAxisSpacing: 4,
               crossAxisSpacing: 4,
-              crossAxisCount: COL,
+              crossAxisCount: GameConfig.columns,
             ),
-            itemCount: COL * ROW,
+            itemCount: GameConfig.columns * GameConfig.rows,
             itemBuilder: (context, index) {
               return Obx(() {
                 final isOccupied =
@@ -60,8 +62,8 @@ class ArcadeGameBoard extends StatelessWidget {
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeOut,
-                  width: BOARD_CELL_SIZE,
-                  height: BOARD_CELL_SIZE,
+                  width: metrics.boardCellSize,
+                  height: metrics.boardCellSize,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(

@@ -10,14 +10,15 @@ class SolveBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final metrics = GameConfig.layoutOf(context);
     GameController solveController = Get.find<GameController>();
     return Center(
       child: Column(
         children: [
           Container(
             padding: EdgeInsets.all(6),
-            height: SOLVE_SIZE,
-            width: SOLVE_SIZE,
+            height: metrics.solveBoardSize,
+            width: metrics.solveBoardSize,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(18),
               gradient: LinearGradient(
@@ -41,15 +42,15 @@ class SolveBoard extends StatelessWidget {
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: COL),
-                itemCount: COL * ROW,
+                    crossAxisCount: GameConfig.columns),
+                itemCount: GameConfig.columns * GameConfig.rows,
                 itemBuilder: (context, index) {
                   return Obx(() {
                     return AnimatedContainer(
                       duration: Duration(milliseconds: 500),
                       curve: Curves.easeOut,
-                      width: SOLVE_CELL_SIZE,
-                      height: SOLVE_CELL_SIZE,
+                      width: metrics.solveCellSize,
+                      height: metrics.solveCellSize,
                       margin: EdgeInsets.all(2),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),

@@ -9,10 +9,14 @@ import 'package:overlap/models/game_state.dart';
 import 'package:overlap/models/stage_data.dart';
 
 class ArcadeGameController extends GetxController {
-  final RxList<BoardCellState> boardList =
-      RxList.generate(COL * ROW, (_) => BoardCellState.empty);
-  final RxList<BoardCellState> solveList =
-      RxList.generate(COL * ROW, (_) => BoardCellState.empty);
+  final RxList<BoardCellState> boardList = RxList.generate(
+    GameConfig.columns * GameConfig.rows,
+    (_) => BoardCellState.empty,
+  );
+  final RxList<BoardCellState> solveList = RxList.generate(
+    GameConfig.columns * GameConfig.rows,
+    (_) => BoardCellState.empty,
+  );
 
   final RxList<BlockState> availableBlocks = <BlockState>[].obs;
 
@@ -68,7 +72,7 @@ class ArcadeGameController extends GetxController {
 
     final blocks = <BlockState>[];
     for (final name in stage.blockNames.toSet()) {
-      final shape = blockShapes[name];
+      final shape = GameConfig.blockShapes[name];
       if (shape == null) {
         debugPrint('Unknown block name: $name');
         continue;
@@ -93,16 +97,20 @@ class ArcadeGameController extends GetxController {
   }
 
   bool _isWithinBoard(int col, int row) {
-    return row >= 0 && row < ROW && col >= 0 && col < COL;
+    return row >= 0 &&
+        row < GameConfig.rows &&
+        col >= 0 &&
+        col < GameConfig.columns;
   }
 
   void _toggleCell(RxList<BoardCellState> target, int col, int row) {
     if (!_isWithinBoard(col, row)) {
       return;
     }
-    final index = row * COL + col;
-    target[index] =
-        target[index] == BoardCellState.empty ? BoardCellState.occupied : BoardCellState.empty;
+    final index = row * GameConfig.columns + col;
+    target[index] = target[index] == BoardCellState.empty
+        ? BoardCellState.occupied
+        : BoardCellState.empty;
   }
 
   bool isSolutionMatched() {
@@ -173,14 +181,18 @@ class ArcadeGameController extends GetxController {
     final rotatedBlock = <Offset>[];
 
     for (final offset in block.offsets) {
-      double x = offset.dx - CENTER_POINT;
-      double y = offset.dy - CENTER_POINT;
+      double x = offset.dx - GameConfig.blockPivot;
+      double y = offset.dy - GameConfig.blockPivot;
 
       double rotatedX = -y;
       double rotatedY = x;
 
-      rotatedBlock
-          .add(Offset(rotatedX + CENTER_POINT, rotatedY + CENTER_POINT));
+      rotatedBlock.add(
+        Offset(
+          rotatedX + GameConfig.blockPivot,
+          rotatedY + GameConfig.blockPivot,
+        ),
+      );
     }
 
     final minY = rotatedBlock.map((o) => o.dy).reduce(min);

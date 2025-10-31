@@ -15,6 +15,7 @@ class ArcadeGameScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ArcadeGameController controller = Get.find<ArcadeGameController>();
+    final metrics = GameConfig.layoutOf(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -61,9 +62,9 @@ class ArcadeGameScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 24),
-                    SizedBox(height: CELL_HEIGHT),
+                    SizedBox(height: metrics.cellHeight),
                     _StageStatsRow(stage: stage),
-                    SizedBox(height: CELL_HEIGHT),
+                    SizedBox(height: metrics.cellHeight),
                     const ArcadeGameBoard(),
                     const SizedBox(height: 16),
                     Padding(
@@ -99,9 +100,9 @@ class ArcadeGameScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    SizedBox(height: CELL_HEIGHT * 1.5),
+                    SizedBox(height: metrics.cellHeight * 1.5),
                     const ArcadeGameDrag(),
-                    SizedBox(height: CELL_HEIGHT),
+                    SizedBox(height: metrics.cellHeight),
                   ],
                 ),
                 if (controller.isStageCleared.value)

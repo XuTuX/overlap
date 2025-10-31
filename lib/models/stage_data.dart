@@ -37,14 +37,15 @@ class StageData {
 
   /// JSON(Map) -> StageData 변환.
   factory StageData.fromJson(Map<String, dynamic> json) {
-    final pattern = (json['solutionPattern'] as List<dynamic>? ?? const <dynamic>[])
-        .map<List<int>>(
-          (row) => List<int>.from(
-            (row as List<dynamic>).map((value) => (value as num).toInt()),
-            growable: false,
-          ),
-        )
-        .toList(growable: false);
+    final pattern =
+        (json['solutionPattern'] as List<dynamic>? ?? const <dynamic>[])
+            .map<List<int>>(
+              (row) => List<int>.from(
+                (row as List<dynamic>).map((value) => (value as num).toInt()),
+                growable: false,
+              ),
+            )
+            .toList(growable: false);
 
     return StageData(
       id: (json['id'] as num).toInt(),
@@ -80,7 +81,8 @@ List<BoardCellState> patternToCells(List<List<int>> pattern) {
   final flattened = <BoardCellState>[];
   for (final row in pattern) {
     for (final value in row) {
-      flattened.add(value == 1 ? BoardCellState.occupied : BoardCellState.empty);
+      flattened
+          .add(value == 1 ? BoardCellState.occupied : BoardCellState.empty);
     }
   }
   return flattened;

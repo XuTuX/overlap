@@ -80,8 +80,14 @@ class _TutorialScreenState extends State<TutorialScreen> {
                     elevation: 3, // 버튼에 약간의 그림자 추가
                   ),
                   onPressed: () {
-                    final hiveGameBox = HiveGameBox();
-                    hiveGameBox.setTutorialCompleted(true); // 튜토리얼 완료 기록
+                    final hiveGameBox = HiveGameBox.tryOpen();
+                    if (hiveGameBox == null ||
+                        !hiveGameBox.setTutorialCompleted(true)) {
+                      Get.snackbar(
+                        '저장 실패',
+                        '튜토리얼 진행 상태를 저장하지 못했습니다. 저장소 권한을 확인해 주세요.',
+                      );
+                    }
                     Get.offAllNamed('/home');
                   },
                   child: Text(

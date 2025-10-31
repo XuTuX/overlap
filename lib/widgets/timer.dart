@@ -14,6 +14,7 @@ class CircularTimer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final metrics = GameConfig.layoutOf(context);
     return Center(
       child: Obx(() => TweenAnimationBuilder<Duration>(
             key: ValueKey(timerController.restartCounter.value),
@@ -32,8 +33,8 @@ class CircularTimer extends StatelessWidget {
                 alignment: Alignment.center,
                 children: [
                   Container(
-                    width: TIMER_SIZE,
-                    height: TIMER_SIZE,
+                    width: metrics.timerSize,
+                    height: metrics.timerSize,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: LinearGradient(
@@ -64,7 +65,8 @@ class CircularTimer extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: CircularProgressIndicator(
-                            value: 1 - (seconds / timerController.duration.value),
+                            value:
+                                1 - (seconds / timerController.duration.value),
                             strokeWidth: 11.0,
                             backgroundColor:
                                 AppColors.surfaceAlt.withFraction(0.6),

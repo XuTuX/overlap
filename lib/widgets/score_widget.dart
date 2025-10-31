@@ -3,13 +3,14 @@ import 'package:overlap/constants/game_constants.dart';
 import 'package:flutter/material.dart';
 
 class ScoreWidget extends StatelessWidget {
-  final String score;
-  final String highScore;
+  final double score;
+  final double highScore;
 
   const ScoreWidget({super.key, required this.score, required this.highScore});
 
   @override
   Widget build(BuildContext context) {
+    final metrics = GameConfig.layoutOf(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -23,16 +24,16 @@ class ScoreWidget extends StatelessWidget {
           },
           blendMode: BlendMode.srcIn,
           child: Text(
-            score,
+            score.toStringAsFixed(1),
             style: TextStyle(
-              fontSize: ResponsiveSizes.scoreTextSize(),
+              fontSize: metrics.scoreTextSize,
               fontWeight: FontWeight.w700,
               letterSpacing: 1.5,
             ),
           ),
         ),
         SizedBox(
-          height: ResponsiveSizes.highScoreTextSize() * 1.5,
+          height: metrics.highScoreTextSize * 1.5,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -49,9 +50,9 @@ class ScoreWidget extends StatelessWidget {
                 width: 10,
               ),
               Text(
-                highScore,
+                highScore.toStringAsFixed(1),
                 style: TextStyle(
-                  fontSize: ResponsiveSizes.highScoreTextSize(),
+                  fontSize: metrics.highScoreTextSize,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
                 ),

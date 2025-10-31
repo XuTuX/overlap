@@ -35,11 +35,11 @@ void main() async {
 
   await Hive.initFlutter(); // Hive 초기화
   await Hive.openBox('gameBox'); // 박스 열기
-  final hiveGameBox = HiveGameBox();
+  final hiveGameBox = HiveGameBox.tryOpen();
 
   // 튜토리얼 완료 여부에 따라 시작 화면 결정
   final initialRoute =
-      hiveGameBox.isTutorialCompleted() ? '/home' : '/tutorial';
+      hiveGameBox?.isTutorialCompleted() == true ? '/home' : '/tutorial';
   runApp(MyApp(initialRoute: initialRoute));
 }
 

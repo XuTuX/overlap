@@ -1,151 +1,171 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:overlap/controllers/arcade_controller.dart';
+import 'package:overlap/controllers/game_controller.dart';
 import 'package:overlap/models/arcade_stage_data.dart';
-import 'package:overlap/models/hive_game_box.dart';
+import 'package:overlap/widgets/storage_warning_banner.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final HiveGameBox hive = HiveGameBox();
-    final double highScore = hive.getHighScore();
+    final GameController gameController = Get.find<GameController>();
+    final ArcadeController arcadeController = Get.find<ArcadeController>();
 
-    // ⭐ 누적 별 개수 계산
-    int totalStars = 0;
-    for (final stage in arcadeStages) {
-      totalStars += hive.getStageStar(stage.id);
-    }
-    final int maxStars = arcadeStages.length * 3;
+    return Obx(() {
+      final double highScore = gameController.bestScore.value;
+      final int totalStars = arcadeController.stageStars.values.fold(
+        0,
+        (sum, value) => sum + value,
+      );
+      final int maxStars = arcadeStages.length * 3;
+      final List<Widget> warnings = [];
+      final gameWarning = gameController.persistenceWarning.value;
+      if (gameWarning != null) {
+        warnings.add(
+          StorageWarningBanner(
+            message: gameWarning,
+            onRetry: gameController.retryStorage,
+          ),
+        );
+      }
+      final arcadeWarning = arcadeController.persistenceWarning.value;
+      if (arcadeWarning != null) {
+        warnings.add(
+          StorageWarningBanner(
+            message: arcadeWarning,
+            onRetry: arcadeController.retryStorage,
+          ),
+        );
+      }
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text(
-          'Overlap Puzzle',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-            letterSpacing: 0.6,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.lightbulb_outline_rounded,
-                color: Colors.white),
-            onPressed: () => Get.toNamed('/tutorial'),
-          ),
-        ],
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF090B1A), Color(0xFF131A2E)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Stack(
-          children: [
-            const _FloatingOrb(
-              left: -60,
-              top: 40,
-              size: 160,
-              color: Color(0xFF3D5AFE),
+      return Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: const Text(
+            'Overlap Puzzle',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+              letterSpacing: 0.6,
             ),
-            const _FloatingOrb(
-              right: -40,
-              top: 220,
-              size: 120,
-              color: Color(0xFFFF8A65),
-            ),
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 10),
-                    const Text(
-                      '다양한 모드에서 게임을 즐겨보세요.',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // 📦 모드 카드
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _BigModeCard(
-                            title: 'Arcade Mode',
-                            subtitle: '다양한 퍼즐 스테이지에 도전해보세요.',
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFFFF9A8B), Color(0xFFFAD0C4)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            icon: Icons.grid_view_rounded,
-                            onTap: () => Get.toNamed('/arcade'),
-                          ),
-                          const SizedBox(height: 28),
-                          _BigModeCard(
-                            title: 'Infinite Mode',
-                            subtitle: '무한한 플레이로 실력을 증명하세요.',
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF7F7FD5), Color(0xFF86A8E7)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            icon: Icons.all_inclusive_rounded,
-                            onTap: () => Get.toNamed('/game'),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // ⭐ 아래 요약 정보 박스
-                    const SizedBox(height: 30),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 18,
-                        horizontal: 20,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _StatTile(
-                            icon: Icons.star_rounded,
-                            label: 'Arcade Stars',
-                            value: '$totalStars / $maxStars',
-                          ),
-                          _StatTile(
-                            icon: Icons.military_tech_rounded,
-                            label: 'High Score',
-                            value: highScore.toStringAsFixed(1),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.lightbulb_outline_rounded,
+                  color: Colors.white),
+              onPressed: () => Get.toNamed('/tutorial'),
             ),
           ],
         ),
-      ),
-    );
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF090B1A), Color(0xFF131A2E)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: Stack(
+            children: [
+              const _FloatingOrb(
+                left: -60,
+                top: 40,
+                size: 160,
+                color: Color(0xFF3D5AFE),
+              ),
+              const _FloatingOrb(
+                right: -40,
+                top: 220,
+                size: 120,
+                color: Color(0xFFFF8A65),
+              ),
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 10),
+                      const Text(
+                        '다양한 모드에서 게임을 즐겨보세요.',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      ...warnings,
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _BigModeCard(
+                              title: 'Arcade Mode',
+                              subtitle: '다양한 퍼즐 스테이지에 도전해보세요.',
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFFFF9A8B), Color(0xFFFAD0C4)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              icon: Icons.grid_view_rounded,
+                              onTap: () => Get.toNamed('/arcade'),
+                            ),
+                            const SizedBox(height: 28),
+                            _BigModeCard(
+                              title: 'Infinite Mode',
+                              subtitle: '무한한 플레이로 실력을 증명하세요.',
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF7F7FD5), Color(0xFF86A8E7)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              icon: Icons.all_inclusive_rounded,
+                              onTap: () => Get.toNamed('/game'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 18,
+                          horizontal: 20,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _StatTile(
+                              icon: Icons.star_rounded,
+                              label: 'Arcade Stars',
+                              value: '$totalStars / $maxStars',
+                            ),
+                            _StatTile(
+                              icon: Icons.military_tech_rounded,
+                              label: 'High Score',
+                              value: highScore.toStringAsFixed(1),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
   }
 }
 

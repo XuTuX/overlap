@@ -9,6 +9,7 @@ class TetrisModel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const double cellSpacing = 1.0;
+    final metrics = GameConfig.layoutOf(context);
 
     final double minX =
         blockList.map((e) => e.dx).reduce((a, b) => a < b ? a : b);
@@ -17,18 +18,18 @@ class TetrisModel extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(border: Border.all(color: Colors.transparent)),
-      width: BLOCK_BOX_SIZE + 4,
-      height: BLOCK_BOX_SIZE + 4,
+      width: metrics.blockBoxSize + 4,
+      height: metrics.blockBoxSize + 4,
       child: Stack(
         children: blockList.map((offset) {
           final offsetX = offset.dx - minX;
           final offsetY = offset.dy - minY;
           return Positioned(
-            left: offsetX * (BOARD_CELL_SIZE + cellSpacing),
-            top: offsetY * (BOARD_CELL_SIZE + cellSpacing),
+            left: offsetX * (metrics.boardCellSize + cellSpacing),
+            top: offsetY * (metrics.boardCellSize + cellSpacing),
             child: Container(
-              width: (BOARD_CELL_SIZE - cellSpacing * 2),
-              height: (BOARD_CELL_SIZE - cellSpacing * 2),
+              width: (metrics.boardCellSize - cellSpacing * 2),
+              height: (metrics.boardCellSize - cellSpacing * 2),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 gradient: LinearGradient(

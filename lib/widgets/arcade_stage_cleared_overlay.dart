@@ -2,6 +2,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:overlap/constants/app_colors.dart';
 import 'package:overlap/controllers/arcade_game_controller.dart';
 import 'package:overlap/models/arcade_stage_data.dart';
 import 'package:overlap/models/stage_data.dart';
@@ -55,14 +56,14 @@ class ArcadeStageClearedOverlay extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.fromLTRB(28, 32, 28, 24),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.08),
+                        color: Colors.white.withFraction(0.08),
                         borderRadius: BorderRadius.circular(30),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.22),
+                          color: Colors.white.withFraction(0.22),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.28),
+                            color: Colors.black.withFraction(0.28),
                             blurRadius: 28,
                             offset: const Offset(0, 14),
                           ),
@@ -109,7 +110,7 @@ class ArcadeStageClearedOverlay extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.white.withOpacity(0.82),
+                                  color: Colors.white.withFraction(0.82),
                                 ),
                               ),
                               const SizedBox(height: 20),
@@ -120,9 +121,9 @@ class ArcadeStageClearedOverlay extends StatelessWidget {
                                     horizontal: 18, vertical: 18),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(24),
-                                  color: Colors.white.withOpacity(0.07),
+                                  color: Colors.white.withFraction(0.07),
                                   border: Border.all(
-                                    color: Colors.white.withOpacity(0.14),
+                                    color: Colors.white.withFraction(0.14),
                                   ),
                                 ),
                                 child: Column(
@@ -154,7 +155,7 @@ class ArcadeStageClearedOverlay extends StatelessWidget {
                                     Text(
                                       '목표 $targetMoves회 · $moves회로 클리어',
                                       style: TextStyle(
-                                        color: Colors.white.withOpacity(0.78),
+                                        color: Colors.white.withFraction(0.78),
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -225,8 +226,8 @@ class _AccentBlob extends StatelessWidget {
         shape: BoxShape.circle,
         gradient: RadialGradient(
           colors: [
-            colors.first.withOpacity(0.28), // 불투명도 낮춤
-            colors.last.withOpacity(0.12),
+            colors.first.withFraction(0.28), // 불투명도 낮춤
+            colors.last.withFraction(0.12),
           ],
           center: Alignment.center,
           radius: 0.8,
@@ -246,9 +247,9 @@ class _StageBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withFraction(0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.3)),
+        border: Border.all(color: Colors.white.withFraction(0.3)),
       ),
       child: Text(
         label,
@@ -279,7 +280,7 @@ class _InfoTile extends StatelessWidget {
           Text(label,
               style: TextStyle(
                   fontSize: 13,
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withFraction(0.7),
                   fontWeight: FontWeight.w500)),
           const SizedBox(height: 4),
           Text(value,
@@ -302,9 +303,9 @@ class _PerformanceChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withFraction(0.15),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.5)),
+        border: Border.all(color: color.withFraction(0.5)),
       ),
       child: Text(
         label,
@@ -328,7 +329,7 @@ class _NextStageHint extends StatelessWidget {
     return Text(
       '다음 스테이지: $title',
       style: TextStyle(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withFraction(0.7),
         fontSize: 14,
         fontWeight: FontWeight.w500,
       ),
@@ -354,7 +355,7 @@ class _StarRow extends StatelessWidget {
             size: 32,
             color: filled
                 ? const Color(0xFFFFC850)
-                : Colors.white.withOpacity(0.35),
+                : Colors.white.withFraction(0.35),
           ),
         );
       }),
@@ -391,11 +392,11 @@ class _ActionRow extends StatelessWidget {
             onPressed: onTap,
             style: FilledButton.styleFrom(
               padding: EdgeInsets.zero,
-              backgroundColor: Colors.white.withOpacity(0.10),
+              backgroundColor: Colors.white.withFraction(0.10),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
-                side: BorderSide(color: Colors.white.withOpacity(0.25)),
+                side: BorderSide(color: Colors.white.withFraction(0.25)),
               ),
               textStyle:
                   const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),

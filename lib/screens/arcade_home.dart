@@ -55,7 +55,7 @@ class ArcadeHomeScreen extends GetView<ArcadeController> {
                         isSelected: true, // Always selected in PageView
                         onTap: () {
                           controller.selectMonth(chapter);
-                          controller.refreshProgress();
+                          WidgetsBinding.instance.addPostFrameCallback((_) {});
                           Get.toNamed('/arcade/stages');
                         },
                       );

@@ -55,8 +55,7 @@ class ArcadeChapter {
       stages.map((stage) => stage.id).toList(growable: false);
 
   /// 해당 스테이지 ID가 챕터에 속하는지 확인.
-  bool containsStage(int stageId) =>
-      stages.any((stage) => stage.id == stageId);
+  bool containsStage(int stageId) => stages.any((stage) => stage.id == stageId);
 
   /// 챕터 전용 그라디언트.
   LinearGradient get gradient => LinearGradient(
@@ -72,8 +71,7 @@ class ArcadeChapter {
       id: json['id'] as String? ?? '',
       title: json['title'] as String? ?? '',
       stages: stagesJson
-          .map((stage) =>
-              StageData.fromJson(stage as Map<String, dynamic>))
+          .map((stage) => StageData.fromJson(stage as Map<String, dynamic>))
           .toList(growable: false),
       plannedStageCount: _readOptionalInt(json['plannedStageCount']) ??
           _readOptionalInt(json['stageCount']),
@@ -93,11 +91,9 @@ class ArcadeChapter {
     return <String, dynamic>{
       'id': id,
       'title': title,
-      'stages':
-          stages.map((stage) => stage.toJson()).toList(growable: false),
+      'stages': stages.map((stage) => stage.toJson()).toList(growable: false),
       'stageCount': stageCount,
-      if (plannedStageCount != null)
-        'plannedStageCount': plannedStageCount,
+      if (plannedStageCount != null) 'plannedStageCount': plannedStageCount,
       'stepCount': stepCount,
       if (description != null) 'description': description,
       if (releaseAt != null) 'releaseAt': releaseAt!.toIso8601String(),
@@ -135,8 +131,7 @@ class ArcadeChapter {
   }
 
   static int _colorToInt(Color color) {
-    int channel(double component) =>
-        (component * 255.0).round() & 0xff;
+    int channel(double component) => (component * 255.0).round() & 0xff;
     return (channel(color.a) << 24) |
         (channel(color.r) << 16) |
         (channel(color.g) << 8) |

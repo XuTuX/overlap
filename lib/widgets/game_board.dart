@@ -11,6 +11,7 @@ class GameBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final metrics = GameConfig.layoutOf(context);
     GameController gameController = Get.find<GameController>();
     return Center(
       child: Obx(() {
@@ -25,8 +26,8 @@ class GameBoard extends StatelessWidget {
         return AnimatedContainer(
           duration: Duration(seconds: 1),
           curve: Curves.easeInOut,
-          height: (BOARD_SIZE * 1.1),
-          width: (BOARD_SIZE * 1.1),
+          height: metrics.boardSize * 1.1,
+          width: metrics.boardSize * 1.1,
           padding: EdgeInsets.all(5),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
@@ -49,17 +50,19 @@ class GameBoard extends StatelessWidget {
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  mainAxisSpacing: 4, crossAxisSpacing: 4, crossAxisCount: COL),
-              itemCount: COL * ROW,
+                  mainAxisSpacing: 4,
+                  crossAxisSpacing: 4,
+                  crossAxisCount: GameConfig.columns),
+              itemCount: GameConfig.columns * GameConfig.rows,
               itemBuilder: (context, index) {
                 return Obx(() {
-                  final isOccupied =
-                      gameController.boardList[index] == BoardCellState.occupied;
+                  final isOccupied = gameController.boardList[index] ==
+                      BoardCellState.occupied;
                   return AnimatedContainer(
                     duration: Duration(milliseconds: 200),
                     curve: Curves.easeOut,
-                    width: BOARD_CELL_SIZE,
-                    height: BOARD_CELL_SIZE,
+                    width: metrics.boardCellSize,
+                    height: metrics.boardCellSize,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(

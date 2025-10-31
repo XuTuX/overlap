@@ -11,13 +11,14 @@ class ArcadeSolveBoard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ArcadeGameController controller = Get.find<ArcadeGameController>();
+    final metrics = GameConfig.layoutOf(context);
     return Center(
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(6),
-            height: SOLVE_SIZE,
-            width: SOLVE_SIZE,
+            height: metrics.solveBoardSize,
+            width: metrics.solveBoardSize,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(18),
               gradient: LinearGradient(
@@ -40,10 +41,10 @@ class ArcadeSolveBoard extends StatelessWidget {
             child: GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: COL,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: GameConfig.columns,
               ),
-              itemCount: COL * ROW,
+              itemCount: GameConfig.columns * GameConfig.rows,
               itemBuilder: (context, index) {
                 return Obx(() {
                   final isOccupied =
@@ -51,8 +52,8 @@ class ArcadeSolveBoard extends StatelessWidget {
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 500),
                     curve: Curves.easeOut,
-                    width: SOLVE_CELL_SIZE,
-                    height: SOLVE_CELL_SIZE,
+                    width: metrics.solveCellSize,
+                    height: metrics.solveCellSize,
                     margin: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),

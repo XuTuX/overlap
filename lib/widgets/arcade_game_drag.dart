@@ -12,6 +12,7 @@ class ArcadeGameDrag extends StatelessWidget {
   Widget build(BuildContext context) {
     final ArcadeGameController gameController =
         Get.find<ArcadeGameController>();
+    final metrics = GameConfig.layoutOf(context);
     return Obx(() {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,8 +44,8 @@ class ArcadeGameDrag extends StatelessWidget {
                   key: ValueKey('${block.name}-$index'),
                   feedback: TetrisModel(blockList: block.offsets),
                   childWhenDragging: SizedBox(
-                    width: BLOCK_BOX_SIZE,
-                    height: BLOCK_BOX_SIZE,
+                    width: metrics.blockBoxSize,
+                    height: metrics.blockBoxSize,
                   ),
                   child: blockWidget,
                   dragAnchorStrategy: (draggable, context, position) {
@@ -63,14 +64,14 @@ class ArcadeGameDrag extends StatelessWidget {
 
                     final col = ((dragPosition.dx -
                                 gridPosition.dx +
-                                BOARD_CELL_SIZE * 0.5) /
-                            BOARD_CELL_SIZE)
+                                metrics.boardCellSize * 0.5) /
+                            metrics.boardCellSize)
                         .floor();
 
                     final row = ((dragPosition.dy -
                                 gridPosition.dy +
-                                BOARD_CELL_SIZE * 0.5) /
-                            BOARD_CELL_SIZE)
+                                metrics.boardCellSize * 0.5) /
+                            metrics.boardCellSize)
                         .floor();
 
                     gameController.insert(block, col, row);
@@ -78,7 +79,7 @@ class ArcadeGameDrag extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                height: CELL_HEIGHT,
+                height: metrics.cellHeight,
               ),
               ElevatedButton(
                 onPressed: () => gameController.rotateBlock(index),
@@ -91,8 +92,8 @@ class ArcadeGameDrag extends StatelessWidget {
                 ),
                 child: Image.asset(
                   'assets/image/rotate.png',
-                  width: ResponsiveSizes.rotateIconSize(),
-                  height: ResponsiveSizes.rotateIconSize(),
+                  width: metrics.rotateIconSize,
+                  height: metrics.rotateIconSize,
                   color: AppColors.accent,
                 ),
               ),

@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:overlap/constants/game_constants.dart';
 import 'package:overlap/controllers/timer_controller.dart';
@@ -9,14 +11,27 @@ import 'package:overlap/models/game_state.dart';
 import 'package:overlap/models/hive_game_box.dart';
 
 class GameController extends GetxController {
-  final TimerController timerController = Get.put(TimerController());
-  final HiveGameBox hiveGameBox = HiveGameBox();
-  final Random _random = Random();
+  GameController({HiveGameBox? hiveGameBox, TimerController? timerController})
+      : timerController = timerController ?? Get.put(TimerController()) {
+    _assignHiveBox(hiveGameBox);
+  }
 
-  final RxList<BoardCellState> boardList =
-      RxList.generate(COL * ROW, (_) => BoardCellState.empty);
-  final RxList<BoardCellState> solveList =
-      RxList.generate(COL * ROW, (_) => BoardCellState.empty);
+  final TimerController timerController;
+  HiveGameBox? _hiveGameBox;
+  final Random _random = Random();
+  final RxDouble bestScore = 0.0.obs;
+  final RxnString persistenceWarning = RxnString();
+  double _fallbackHighScore = 0.0;
+  bool _hasShownWarning = false;
+
+  final RxList<BoardCellState> boardList = RxList.generate(
+    GameConfig.columns * GameConfig.rows,
+    (_) => BoardCellState.empty,
+  );
+  final RxList<BoardCellState> solveList = RxList.generate(
+    GameConfig.columns * GameConfig.rows,
+    (_) => BoardCellState.empty,
+  );
 
   final RxList<BlockState> availableBlocks = <BlockState>[].obs;
 
@@ -34,14 +49,80 @@ class GameController extends GetxController {
 
   final RxBool shakeBoard = false.obs;
 
+  void _assignHiveBox(HiveGameBox? hiveGameBox) {
+    _hiveGameBox =
+        hiveGameBox ?? HiveGameBox.tryOpen(onError: _recordPersistenceFailure);
+    if (_hiveGameBox == null) {
+      _ensureWarning();
+    } else {
+      _scheduleWarningUpdate(null);
+    }
+  }
+
+  void _recordPersistenceFailure(Object error, StackTrace stackTrace) {
+    debugPrint('GameController storage error: $error');
+    debugPrintStack(stackTrace: stackTrace);
+    _hiveGameBox = null;
+    _ensureWarning();
+  }
+
+  void _ensureWarning() {
+    if (_hasShownWarning) return;
+    _hasShownWarning = true;
+    _scheduleWarningUpdate(
+      '하이스코어를 저장할 수 없습니다. 저장소 권한이나 공간을 확인한 뒤 다시 시도해주세요.',
+      markWarningShown: true,
+    );
+  }
+
+  void _applyWarning(String? message, {bool markWarningShown = false}) {
+    persistenceWarning.value = message;
+    _hasShownWarning = markWarningShown ? true : message != null;
+  }
+
+  void _scheduleWarningUpdate(String? message,
+      {bool markWarningShown = false}) {
+    void apply() => _applyWarning(message, markWarningShown: markWarningShown);
+    final binding = SchedulerBinding.instance;
+
+    binding.addPostFrameCallback((_) => apply());
+  }
+
+  void _updateBestScore(double newHighScore) {
+    if (newHighScore <= bestScore.value) {
+      return;
+    }
+    final binding = SchedulerBinding.instance;
+
+    binding.addPostFrameCallback((_) {
+      if (newHighScore > bestScore.value) {
+        bestScore.value = newHighScore;
+      }
+    });
+  }
+
+  double _readHighScore() {
+    final hiveGameBox = _hiveGameBox;
+    if (hiveGameBox != null) {
+      return hiveGameBox.getHighScore();
+    }
+    return _fallbackHighScore;
+  }
+
+  void retryStorage() {
+    _assignHiveBox(null);
+    bestScore.value = _readHighScore();
+  }
+
   @override
   void onInit() {
     super.onInit();
     applyNextBlockOverlay();
+    bestScore.value = _readHighScore();
   }
 
   void startCountdown() async {
-    await Future.delayed(Duration(seconds: DURATION));
+    await Future.delayed(GameConfig.countdownDelay);
     isCountdownDone.value = true;
   }
 
@@ -62,8 +143,8 @@ class GameController extends GetxController {
 
     for (final block in selectedBlocks) {
       final startPosition = Offset(
-        _random.nextInt(COL - 2) + 1.0,
-        _random.nextInt(ROW - 2) + 1.0,
+        _random.nextInt(GameConfig.columns - 2) + 1.0,
+        _random.nextInt(GameConfig.rows - 2) + 1.0,
       );
 
       final rotatedBlock = randomRotateBlock(block.offsets);
@@ -78,22 +159,26 @@ class GameController extends GetxController {
   }
 
   bool _isWithinBoard(int col, int row) {
-    return row >= 0 && row < ROW && col >= 0 && col < COL;
+    return row >= 0 &&
+        row < GameConfig.rows &&
+        col >= 0 &&
+        col < GameConfig.columns;
   }
 
   void _toggleCell(RxList<BoardCellState> target, int col, int row) {
     if (!_isWithinBoard(col, row)) {
       return;
     }
-    final index = row * COL + col;
-    target[index] =
-        target[index] == BoardCellState.empty ? BoardCellState.occupied : BoardCellState.empty;
+    final index = row * GameConfig.columns + col;
+    target[index] = target[index] == BoardCellState.empty
+        ? BoardCellState.occupied
+        : BoardCellState.empty;
   }
 
   void toggleBlockOnSolve(List<Offset> block, int col, int row) {
     for (var offset in block) {
-      final targetCol = col + (offset.dx - CENTER_POINT).toInt();
-      final targetRow = row + (offset.dy - CENTER_POINT).toInt();
+      final targetCol = col + (offset.dx - GameConfig.blockPivot).toInt();
+      final targetRow = row + (offset.dy - GameConfig.blockPivot).toInt();
       _toggleCell(solveList, targetCol, targetRow);
     }
     update();
@@ -196,11 +281,12 @@ class GameController extends GetxController {
 
     availableBlocks.clear();
 
-    final allBlockNames = blockShapes.keys.toList()..shuffle(_random);
-    final count = min(BLOCK_LIST_COUNTS, allBlockNames.length);
+    final allBlockNames = GameConfig.blockShapes.keys.toList()
+      ..shuffle(_random);
+    final count = min(GameConfig.availableBlockCount, allBlockNames.length);
     for (var i = 0; i < count; i++) {
       final blockName = allBlockNames[i];
-      final offsets = blockShapes[blockName]!;
+      final offsets = GameConfig.blockShapes[blockName]!;
       availableBlocks.add(BlockState(name: blockName, offsets: offsets));
     }
   }
@@ -234,14 +320,18 @@ class GameController extends GetxController {
     final rotatedBlock = <Offset>[];
 
     for (final offset in block.offsets) {
-      double x = offset.dx - CENTER_POINT;
-      double y = offset.dy - CENTER_POINT;
+      double x = offset.dx - GameConfig.blockPivot;
+      double y = offset.dy - GameConfig.blockPivot;
 
       double rotatedX = -y;
       double rotatedY = x;
 
-      rotatedBlock
-          .add(Offset(rotatedX + CENTER_POINT, rotatedY + CENTER_POINT));
+      rotatedBlock.add(
+        Offset(
+          rotatedX + GameConfig.blockPivot,
+          rotatedY + GameConfig.blockPivot,
+        ),
+      );
     }
 
     final minY = rotatedBlock.map((o) => o.dy).reduce(min);
@@ -274,7 +364,16 @@ class GameController extends GetxController {
 
   void gameover() {
     isGameOver.value = true;
-    hiveGameBox.setHighScore(score.value);
+    final newHighScore = score.value;
+    final stored = _hiveGameBox?.setHighScore(newHighScore) ?? false;
+    if (!stored) {
+      _fallbackHighScore = max(_fallbackHighScore, newHighScore);
+      _recordPersistenceFailure(
+        'Failed to persist high score',
+        StackTrace.current,
+      );
+    }
+    _updateBestScore(newHighScore);
   }
 
   void insert(BlockState block, int col, int row) {

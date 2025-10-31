@@ -12,6 +12,7 @@ class GameDrag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GameController gameController = Get.find<GameController>();
+    final metrics = GameConfig.layoutOf(context);
     return Obx(() {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -27,18 +28,21 @@ class GameDrag extends StatelessWidget {
                   key: ValueKey('${block.name}-$index'), // 각 항목에 고유한 키 부여
                   feedback: TetrisModel(blockList: block.offsets),
                   childWhenDragging: SizedBox(
-                    width: BLOCK_BOX_SIZE,
-                    height: BLOCK_BOX_SIZE,
+                    width: metrics.blockBoxSize,
+                    height: metrics.blockBoxSize,
                   ),
-                  child: TetrisModel(blockList: block.offsets),
+                  child: Container(
+                    padding: EdgeInsets.all(2),
+                    child: TetrisModel(blockList: block.offsets),
+                  ),
                   dragAnchorStrategy: (draggable, context, position) {
                     final offsetX = context.size!.width / 2;
                     final offsetY = context.size!.height + 27;
                     return Offset(offsetX, offsetY);
                   },
                   onDragEnd: (details) {
-                    final renderObject =
-                        gameController.gridKey.currentContext?.findRenderObject();
+                    final renderObject = gameController.gridKey.currentContext
+                        ?.findRenderObject();
                     if (renderObject is! RenderBox) return;
                     final gridBox = renderObject;
                     final gridPosition = gridBox.localToGlobal(Offset.zero);
@@ -47,14 +51,14 @@ class GameDrag extends StatelessWidget {
 
                     final col = ((dragPosition.dx -
                                 gridPosition.dx +
-                                BOARD_CELL_SIZE * 0.5) /
-                            BOARD_CELL_SIZE)
+                                metrics.boardCellSize * 0.5) /
+                            metrics.boardCellSize)
                         .floor();
 
                     final row = ((dragPosition.dy -
                                 gridPosition.dy +
-                                BOARD_CELL_SIZE * 0.5) /
-                            BOARD_CELL_SIZE)
+                                metrics.boardCellSize * 0.5) /
+                            metrics.boardCellSize)
                         .floor();
 
                     gameController.insert(block, col, row);
@@ -62,7 +66,7 @@ class GameDrag extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                height: CELL_HEIGHT,
+                height: metrics.cellHeight,
               ),
               ElevatedButton(
                 onPressed: () => gameController.rotateBlock(index),
@@ -75,8 +79,8 @@ class GameDrag extends StatelessWidget {
                 ),
                 child: Image.asset(
                   'assets/image/rotate.png',
-                  width: ResponsiveSizes.rotateIconSize(),
-                  height: ResponsiveSizes.rotateIconSize(),
+                  width: metrics.rotateIconSize,
+                  height: metrics.rotateIconSize,
                   color: AppColors.accent,
                 ),
               ),

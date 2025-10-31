@@ -9,7 +9,7 @@ class ExitDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.white.withOpacity(0.08),
+      backgroundColor: Colors.white.withFraction(0.08),
       insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(28),
@@ -23,13 +23,13 @@ class ExitDialog extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Colors.white.withOpacity(0.15),
-                  Colors.white.withOpacity(0.05),
+                  Colors.white.withFraction(0.15),
+                  Colors.white.withFraction(0.05),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              border: Border.all(color: Colors.white.withOpacity(0.25)),
+              border: Border.all(color: Colors.white.withFraction(0.25)),
               borderRadius: BorderRadius.circular(28),
             ),
             child: Column(
@@ -76,7 +76,7 @@ class ExitDialog extends StatelessWidget {
                         onPressed: Get.back,
                         style: OutlinedButton.styleFrom(
                           side:
-                              BorderSide(color: Colors.white.withOpacity(0.4)),
+                              BorderSide(color: Colors.white.withFraction(0.4)),
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
@@ -102,7 +102,7 @@ class ExitDialog extends StatelessWidget {
                             borderRadius: BorderRadius.circular(14),
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shadowColor: AppColors.accent.withOpacity(0.5),
+                          shadowColor: AppColors.accent.withFraction(0.5),
                           elevation: 8,
                         ),
                         child: const Text(

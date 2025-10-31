@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:overlap/constants/app_colors.dart';
 
 class StageBox extends StatefulWidget {
   final String label;
@@ -81,19 +82,25 @@ class _StageBoxState extends State<StageBox>
                   borderRadius: BorderRadius.circular(24),
                   gradient: LinearGradient(
                     colors: unlocked
-                        ? [accent.withOpacity(0.95), accent.withOpacity(0.6)]
-                        : [accent.withOpacity(0.45), accent.withOpacity(0.25)],
+                        ? [
+                            accent.withFraction(0.95),
+                            accent.withFraction(0.6),
+                          ]
+                        : [
+                            accent.withFraction(0.45),
+                            accent.withFraction(0.25),
+                          ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   border: Border.all(
-                    color: Colors.white.withOpacity(unlocked ? 0.25 : 0.1),
+                    color: Colors.white.withFraction(unlocked ? 0.25 : 0.1),
                     width: 1.2,
                   ),
                   boxShadow: unlocked
                       ? [
                           BoxShadow(
-                            color: accent.withOpacity(0.35),
+                            color: accent.withFraction(0.35),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),
@@ -110,7 +117,7 @@ class _StageBoxState extends State<StageBox>
                           filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                           child: Container(
                             color: Colors.white
-                                .withOpacity(unlocked ? 0.05 : 0.04),
+                                .withFraction(unlocked ? 0.05 : 0.04),
                           ),
                         ),
                       ),
@@ -126,7 +133,7 @@ class _StageBoxState extends State<StageBox>
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  Colors.white.withOpacity(0.12),
+                                  Colors.white.withFraction(0.12),
                                   Colors.transparent,
                                 ],
                                 begin: Alignment.topCenter,
@@ -140,7 +147,7 @@ class _StageBoxState extends State<StageBox>
                       if (!unlocked)
                         Positioned.fill(
                           child:
-                              Container(color: Colors.black.withOpacity(0.35)),
+                              Container(color: Colors.black.withFraction(0.35)),
                         ),
 
                       // 메인 콘텐츠
@@ -161,8 +168,8 @@ class _StageBoxState extends State<StageBox>
                                     fontSize: fontSize,
                                     fontWeight: FontWeight.w900,
                                     color: unlocked
-                                        ? Colors.white.withOpacity(0.95)
-                                        : Colors.white.withOpacity(0.4),
+                                        ? Colors.white.withFraction(0.95)
+                                        : Colors.white.withFraction(0.4),
                                     letterSpacing: -1,
                                   ),
                                 ),
@@ -194,9 +201,11 @@ class _StageBoxState extends State<StageBox>
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                Colors.white.withOpacity(unlocked ? 0.25 : 0.1),
+                                Colors.white
+                                    .withFraction(unlocked ? 0.25 : 0.1),
                                 Colors.transparent,
-                                Colors.white.withOpacity(unlocked ? 0.25 : 0.1),
+                                Colors.white
+                                    .withFraction(unlocked ? 0.25 : 0.1),
                               ],
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
@@ -238,7 +247,7 @@ class _StarRow extends StatelessWidget {
               color: filled
                   ? const Color(0xFFFFD36E)
                   : (isUnlocked
-                      ? Colors.white.withOpacity(0.4)
+                      ? Colors.white.withFraction(0.4)
                       : Colors.white24),
             ),
           ),

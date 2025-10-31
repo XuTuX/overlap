@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:overlap/constants/app_colors.dart';
 import 'package:overlap/constants/game_constants.dart';
 import 'package:overlap/controllers/game_controller.dart';
-import 'package:overlap/models/hive_game_box.dart';
 import 'package:overlap/widgets/count_down_overlay.dart';
 import 'package:overlap/widgets/exit_dialog.dart';
 import 'package:overlap/widgets/game_board.dart';
@@ -11,6 +10,7 @@ import 'package:overlap/widgets/game_drag.dart';
 import 'package:overlap/widgets/game_over.dart';
 import 'package:overlap/widgets/score_widget.dart';
 import 'package:overlap/widgets/solve_board.dart';
+import 'package:overlap/widgets/storage_warning_banner.dart';
 import 'package:overlap/widgets/timer.dart';
 
 class GameScreen extends StatefulWidget {
@@ -22,7 +22,6 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   final GameController gameController = Get.find<GameController>();
-  final HiveGameBox hiveGameBox = HiveGameBox();
 
   @override
   void initState() {
@@ -32,11 +31,12 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final metrics = GameConfig.layoutOf(context);
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Obx(() {
-          final double highScore = hiveGameBox.getHighScore();
+          final double highScore = gameController.bestScore.value;
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -51,8 +51,8 @@ class _GameScreenState extends State<GameScreen> {
               Expanded(
                 child: Center(
                   child: ScoreWidget(
-                    score: gameController.score.toString(),
-                    highScore: highScore.toString(),
+                    score: gameController.score.value,
+                    highScore: highScore,
                   ),
                 ),
               ),
@@ -114,9 +114,19 @@ class _GameScreenState extends State<GameScreen> {
                     const SolveBoard(),
                   ],
                 ),
-                SizedBox(height: CELL_HEIGHT),
+                Obx(() {
+                  final message = gameController.persistenceWarning.value;
+                  if (message == null) {
+                    return const SizedBox.shrink();
+                  }
+                  return StorageWarningBanner(
+                    message: message,
+                    onRetry: gameController.retryStorage,
+                  );
+                }),
+                SizedBox(height: metrics.cellHeight),
                 const GameBoard(),
-                SizedBox(height: CELL_HEIGHT),
+                SizedBox(height: metrics.cellHeight),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Row(
@@ -143,7 +153,7 @@ class _GameScreenState extends State<GameScreen> {
                     ],
                   ),
                 ),
-                SizedBox(height: CELL_HEIGHT * 2),
+                SizedBox(height: metrics.cellHeight * 2),
                 const GameDrag(),
               ],
             );

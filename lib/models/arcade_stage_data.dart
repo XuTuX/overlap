@@ -288,8 +288,7 @@ final List<StageData> januaryStages = List<StageData>.unmodifiable([
 ]);
 
 /// 아케이드 챕터(월) 구성 데이터.
-final List<ArcadeChapter> arcadeChapters =
-    List<ArcadeChapter>.unmodifiable([
+final List<ArcadeChapter> arcadeChapters = List<ArcadeChapter>.unmodifiable([
   ArcadeChapter(
     id: 'january',
     title: '2025 January',
@@ -389,12 +388,10 @@ final List<ArcadeChapter> arcadeChapters =
 ]);
 
 /// 편의상 모든 스테이지를 일괄 접근할 수 있는 목록/맵 제공.
-final List<StageData> arcadeStages =
-    List<StageData>.unmodifiable([
+final List<StageData> arcadeStages = List<StageData>.unmodifiable([
   for (final chapter in arcadeChapters) ...chapter.stages,
 ]);
 
-final Map<int, StageData> arcadeStageMap =
-    Map<int, StageData>.unmodifiable({
+final Map<int, StageData> arcadeStageMap = Map<int, StageData>.unmodifiable({
   for (final stage in arcadeStages) stage.id: stage,
 });
