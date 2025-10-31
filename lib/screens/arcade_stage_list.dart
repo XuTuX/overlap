@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:overlap/controller/arcade_controller.dart';
-import 'package:overlap/controller/arcade_game_controller.dart';
+import 'package:overlap/controllers/arcade_controller.dart';
+import 'package:overlap/controllers/arcade_game_controller.dart';
 import 'package:overlap/models/arcade_chapter.dart';
 import 'package:overlap/models/stage_data.dart';
-import 'package:overlap/widget/stage_box.dart';
+import 'package:overlap/widgets/stage_box.dart';
 
 class ArcadeStageListScreen extends StatefulWidget {
   const ArcadeStageListScreen({super.key});

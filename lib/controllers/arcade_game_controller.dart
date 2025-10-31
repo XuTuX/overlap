@@ -2,17 +2,17 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:overlap/constants/game_constant.dart';
-import 'package:overlap/controller/arcade_controller.dart';
-import 'package:overlap/enum/bord_enum.dart';
+import 'package:overlap/constants/game_constants.dart';
+import 'package:overlap/controllers/arcade_controller.dart';
+import 'package:overlap/enums/board_cell_state.dart';
 import 'package:overlap/models/game_state.dart';
 import 'package:overlap/models/stage_data.dart';
 
 class ArcadeGameController extends GetxController {
-  final RxList<Cellstate> boardList =
-      RxList.generate(COL * ROW, (_) => Cellstate.empty);
-  final RxList<Cellstate> solveList =
-      RxList.generate(COL * ROW, (_) => Cellstate.empty);
+  final RxList<BoardCellState> boardList =
+      RxList.generate(COL * ROW, (_) => BoardCellState.empty);
+  final RxList<BoardCellState> solveList =
+      RxList.generate(COL * ROW, (_) => BoardCellState.empty);
 
   final RxList<BlockState> availableBlocks = <BlockState>[].obs;
 
@@ -45,7 +45,7 @@ class ArcadeGameController extends GetxController {
 
   void _clearSolveBoard() {
     for (int i = 0; i < solveList.length; i++) {
-      solveList[i] = Cellstate.empty;
+      solveList[i] = BoardCellState.empty;
     }
     solveList.refresh();
   }
@@ -96,13 +96,13 @@ class ArcadeGameController extends GetxController {
     return row >= 0 && row < ROW && col >= 0 && col < COL;
   }
 
-  void _toggleCell(RxList<Cellstate> target, int col, int row) {
+  void _toggleCell(RxList<BoardCellState> target, int col, int row) {
     if (!_isWithinBoard(col, row)) {
       return;
     }
     final index = row * COL + col;
     target[index] =
-        target[index] == Cellstate.empty ? Cellstate.occupied : Cellstate.empty;
+        target[index] == BoardCellState.empty ? BoardCellState.occupied : BoardCellState.empty;
   }
 
   bool isSolutionMatched() {
@@ -115,7 +115,7 @@ class ArcadeGameController extends GetxController {
   }
 
   void saveState() {
-    final boardCopy = List<Cellstate>.from(boardList);
+    final boardCopy = List<BoardCellState>.from(boardList);
     final blocksCopy =
         availableBlocks.map((block) => block.copyWith()).toList();
 
@@ -148,7 +148,7 @@ class ArcadeGameController extends GetxController {
 
   void resetBoard() {
     for (int i = 0; i < boardList.length; i++) {
-      boardList[i] = Cellstate.empty;
+      boardList[i] = BoardCellState.empty;
     }
     boardList.refresh();
   }

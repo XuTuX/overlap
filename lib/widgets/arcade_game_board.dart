@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:overlap/constants/app_colors.dart';
-import 'package:overlap/constants/game_constant.dart';
-import 'package:overlap/controller/arcade_game_controller.dart';
-import 'package:overlap/enum/bord_enum.dart';
+import 'package:overlap/constants/game_constants.dart';
+import 'package:overlap/controllers/arcade_game_controller.dart';
+import 'package:overlap/enums/board_cell_state.dart';
 
 class ArcadeGameBoard extends StatelessWidget {
   const ArcadeGameBoard({super.key});
@@ -56,7 +56,7 @@ class ArcadeGameBoard extends StatelessWidget {
             itemBuilder: (context, index) {
               return Obx(() {
                 final isOccupied =
-                    gameController.boardList[index] == Cellstate.occupied;
+                    gameController.boardList[index] == BoardCellState.occupied;
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeOut,

@@ -1,0 +1,1 @@
+enum BoardCellState { empty, occupied }

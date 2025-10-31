@@ -1,5 +1,5 @@
 import 'package:overlap/constants/app_colors.dart';
-import 'package:overlap/constants/game_constant.dart';
+import 'package:overlap/constants/game_constants.dart';
 import 'package:flutter/material.dart';
 
 class CountdownOverlay extends StatefulWidget {

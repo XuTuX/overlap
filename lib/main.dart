@@ -4,17 +4,17 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:overlap/constants/app_colors.dart';
-import 'package:overlap/controller/arcade_controller.dart';
-import 'package:overlap/controller/arcade_game_controller.dart';
-import 'package:overlap/controller/game_controller.dart';
+import 'package:overlap/controllers/arcade_controller.dart';
+import 'package:overlap/controllers/arcade_game_controller.dart';
+import 'package:overlap/controllers/game_controller.dart';
 import 'package:overlap/models/hive_game_box.dart';
-import 'package:overlap/screen/arcade_game_screen.dart';
-import 'package:overlap/screen/arcade_home.dart';
-import 'package:overlap/screen/arcade_stage_list.dart';
-import 'package:overlap/screen/game_screen.dart';
-import 'package:overlap/screen/home_screen.dart';
-import 'package:overlap/screen/login_screen.dart';
-import 'package:overlap/screen/tutorial_screen.dart';
+import 'package:overlap/screens/arcade_game_screen.dart';
+import 'package:overlap/screens/arcade_home.dart';
+import 'package:overlap/screens/arcade_stage_list.dart';
+import 'package:overlap/screens/game_screen.dart';
+import 'package:overlap/screens/home_screen.dart';
+import 'package:overlap/screens/login_screen.dart';
+import 'package:overlap/screens/tutorial_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

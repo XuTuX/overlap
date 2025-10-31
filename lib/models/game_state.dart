@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:overlap/enum/bord_enum.dart';
+import 'package:overlap/enums/board_cell_state.dart';
 
 class BlockState {
   final String name;
@@ -20,12 +20,12 @@ class BlockState {
 }
 
 class GameState {
-  final List<Cellstate> board;
+  final List<BoardCellState> board;
   final List<BlockState> blocks;
 
   GameState({
-    required List<Cellstate> board,
+    required List<BoardCellState> board,
     required List<BlockState> blocks,
-  })  : board = List<Cellstate>.from(board),
+  })  : board = List<BoardCellState>.from(board),
         blocks = blocks.map((block) => block.copyWith()).toList();
 }

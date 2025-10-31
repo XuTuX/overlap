@@ -1,48 +1,64 @@
-import 'package:overlap/constants/app_colors.dart';
-import 'package:overlap/constants/game_constant.dart';
-import 'package:overlap/models/tetris_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:overlap/constants/app_colors.dart';
+import 'package:overlap/constants/game_constants.dart';
+import 'package:overlap/controllers/arcade_game_controller.dart';
+import 'package:overlap/models/tetris_model.dart';
 
-import '../controller/game_controller.dart';
-
-class GameDrag extends StatelessWidget {
-  const GameDrag({super.key});
+class ArcadeGameDrag extends StatelessWidget {
+  const ArcadeGameDrag({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final GameController gameController = Get.find<GameController>();
+    final ArcadeGameController gameController =
+        Get.find<ArcadeGameController>();
     return Obx(() {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: List.generate(gameController.availableBlocks.length, (index) {
           final block = gameController.availableBlocks[index];
+          final blockWidget = Stack(
+            children: [
+              TetrisModel(blockList: block.offsets),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                ),
+              ),
+            ],
+          );
+
           return Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5.0),
                 child: Draggable(
-                  key: ValueKey('${block.name}-$index'), // 각 항목에 고유한 키 부여
+                  key: ValueKey('${block.name}-$index'),
                   feedback: TetrisModel(blockList: block.offsets),
                   childWhenDragging: SizedBox(
                     width: BLOCK_BOX_SIZE,
                     height: BLOCK_BOX_SIZE,
                   ),
-                  child: TetrisModel(blockList: block.offsets),
+                  child: blockWidget,
                   dragAnchorStrategy: (draggable, context, position) {
                     final offsetX = context.size!.width / 2;
                     final offsetY = context.size!.height + 27;
                     return Offset(offsetX, offsetY);
                   },
                   onDragEnd: (details) {
-                    final renderObject =
-                        gameController.gridKey.currentContext?.findRenderObject();
+                    final renderObject = gameController.gridKey.currentContext
+                        ?.findRenderObject();
                     if (renderObject is! RenderBox) return;
                     final gridBox = renderObject;
-                    final gridPosition = gridBox.localToGlobal(Offset.zero);
 
+                    final gridPosition = gridBox.localToGlobal(Offset.zero);
                     final dragPosition = details.offset;
 
                     final col = ((dragPosition.dx -

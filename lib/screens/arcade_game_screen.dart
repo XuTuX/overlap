@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:overlap/constants/app_colors.dart';
-import 'package:overlap/constants/game_constant.dart';
-import 'package:overlap/controller/arcade_game_controller.dart';
+import 'package:overlap/constants/game_constants.dart';
+import 'package:overlap/controllers/arcade_game_controller.dart';
 import 'package:overlap/models/stage_data.dart';
-import 'package:overlap/widget/arcade_game_board.dart';
-import 'package:overlap/widget/arcade_game_drag.dart';
-import 'package:overlap/widget/arcade_solve_board.dart';
-import 'package:overlap/widget/arcade_stage_cleared_overlay.dart';
+import 'package:overlap/widgets/arcade_game_board.dart';
+import 'package:overlap/widgets/arcade_game_drag.dart';
+import 'package:overlap/widgets/arcade_solve_board.dart';
+import 'package:overlap/widgets/arcade_stage_cleared_overlay.dart';
 
 class ArcadeGameScreen extends StatelessWidget {
   const ArcadeGameScreen({super.key});

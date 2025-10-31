@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:overlap/constants/app_colors.dart';
-import 'package:overlap/constants/game_constant.dart';
-import 'package:overlap/controller/game_controller.dart';
+import 'package:overlap/constants/game_constants.dart';
+import 'package:overlap/controllers/game_controller.dart';
 import 'package:overlap/models/hive_game_box.dart';
-import 'package:overlap/widget/count_down_overlay.dart';
-import 'package:overlap/widget/game_board.dart';
-import 'package:overlap/widget/game_drag.dart';
-import 'package:overlap/widget/game_over.dart';
-import 'package:overlap/widget/score_widget.dart';
-import 'package:overlap/widget/solve_board.dart';
-import 'package:overlap/widget/timer.dart';
+import 'package:overlap/widgets/count_down_overlay.dart';
+import 'package:overlap/widgets/game_board.dart';
+import 'package:overlap/widgets/game_drag.dart';
+import 'package:overlap/widgets/game_over.dart';
+import 'package:overlap/widgets/score_widget.dart';
+import 'package:overlap/widgets/solve_board.dart';
+import 'package:overlap/widgets/timer.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});

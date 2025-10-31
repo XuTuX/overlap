@@ -2,7 +2,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:overlap/controller/arcade_game_controller.dart';
+import 'package:overlap/controllers/arcade_game_controller.dart';
 import 'package:overlap/models/arcade_stage_data.dart';
 import 'package:overlap/models/stage_data.dart';
 

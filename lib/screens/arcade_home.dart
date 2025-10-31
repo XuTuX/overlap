@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:overlap/controller/arcade_controller.dart';
+import 'package:overlap/controllers/arcade_controller.dart';
 import 'package:overlap/models/arcade_chapter.dart';
-import 'package:overlap/screen/home_screen.dart';
+import 'package:overlap/screens/home_screen.dart';
 
 class ArcadeHomeScreen extends GetView<ArcadeController> {
   const ArcadeHomeScreen({super.key});

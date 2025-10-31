@@ -1,7 +1,7 @@
 import 'package:overlap/constants/app_colors.dart';
-import 'package:overlap/constants/game_constant.dart';
-import 'package:overlap/controller/game_controller.dart';
-import 'package:overlap/enum/bord_enum.dart';
+import 'package:overlap/constants/game_constants.dart';
+import 'package:overlap/controllers/game_controller.dart';
+import 'package:overlap/enums/board_cell_state.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -57,7 +57,7 @@ class SolveBoard extends StatelessWidget {
                             color: Colors.white.withFraction(0.04),
                           ),
                           gradient: solveController.solveList[index] ==
-                                  Cellstate.occupied
+                                  BoardCellState.occupied
                               ? LinearGradient(
                                   colors: AppColors.highlightGradient,
                                   begin: Alignment.topLeft,
@@ -65,13 +65,13 @@ class SolveBoard extends StatelessWidget {
                                 )
                               : null,
                           color: solveController.solveList[index] ==
-                                  Cellstate.occupied
+                                  BoardCellState.occupied
                               ? null
                               : AppColors.surface.withFraction(0.85),
                           boxShadow: [
                             BoxShadow(
                               color: solveController.solveList[index] ==
-                                      Cellstate.occupied
+                                      BoardCellState.occupied
                                   ? AppColors.accent.withFraction(0.3)
                                   : Colors.black.withFraction(0.2),
                               blurRadius: 10,

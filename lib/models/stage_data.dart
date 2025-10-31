@@ -1,4 +1,4 @@
-import 'package:overlap/enum/bord_enum.dart';
+import 'package:overlap/enums/board_cell_state.dart';
 
 /// 퍼즐 스테이지에 대한 정적 데이터 모델.
 ///
@@ -76,11 +76,11 @@ class StageData {
 }
 
 /// 0/1 패턴을 게임 보드에 필요한 셀 리스트로 변환한다.
-List<Cellstate> patternToCells(List<List<int>> pattern) {
-  final flattened = <Cellstate>[];
+List<BoardCellState> patternToCells(List<List<int>> pattern) {
+  final flattened = <BoardCellState>[];
   for (final row in pattern) {
     for (final value in row) {
-      flattened.add(value == 1 ? Cellstate.occupied : Cellstate.empty);
+      flattened.add(value == 1 ? BoardCellState.occupied : BoardCellState.empty);
     }
   }
   return flattened;

@@ -1,8 +1,8 @@
 // circular_timer_view.dart
 import 'package:overlap/constants/app_colors.dart';
-import 'package:overlap/constants/game_constant.dart';
-import 'package:overlap/controller/game_controller.dart';
-import 'package:overlap/controller/timer_controller.dart';
+import 'package:overlap/constants/game_constants.dart';
+import 'package:overlap/controllers/game_controller.dart';
+import 'package:overlap/controllers/timer_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
