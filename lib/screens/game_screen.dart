@@ -44,9 +44,16 @@ class _GameScreenState extends State<GameScreen> {
               IconButton(
                 icon: const Icon(Icons.home_rounded, color: Colors.white),
                 onPressed: () {
-                  Get.dialog(const ExitDialog());
+                  if (gameController.isGameOver.value) {
+                    // 게임이 끝났으면 바로 홈으로 이동
+                    Get.back(); // 또는 Get.offAll(HomeScreen()); 필요 시 교체
+                  } else {
+                    // 게임 중이면 ExitDialog 띄우기
+                    Get.dialog(const ExitDialog());
+                  }
                 },
               ),
+
               // 점수 표시
               Expanded(
                 child: Center(
