@@ -5,6 +5,7 @@ import 'package:overlap/constants/game_constants.dart';
 import 'package:overlap/controllers/game_controller.dart';
 import 'package:overlap/models/hive_game_box.dart';
 import 'package:overlap/widgets/count_down_overlay.dart';
+import 'package:overlap/widgets/exit_dialog.dart';
 import 'package:overlap/widgets/game_board.dart';
 import 'package:overlap/widgets/game_drag.dart';
 import 'package:overlap/widgets/game_over.dart';
@@ -43,73 +44,7 @@ class _GameScreenState extends State<GameScreen> {
               IconButton(
                 icon: const Icon(Icons.home_rounded, color: Colors.white),
                 onPressed: () {
-                  Get.dialog(
-                    Dialog(
-                      backgroundColor: Colors.black.withOpacity(0.85),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.exit_to_app_rounded,
-                              size: 48,
-                              color: AppColors.accent,
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              '홈 화면으로 돌아가시겠어요?',
-                              style: TextStyle(
-                                color: AppColors.textPrimary,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              '진행 중인 게임은 저장되지 않습니다.',
-                              style: TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 14,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 24),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                TextButton(
-                                  onPressed: Get.back,
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: AppColors.textSecondary,
-                                  ),
-                                  child: const Text('취소'),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    Get.offAllNamed('/home');
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.accent,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  child: const Text('나가기'),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    barrierDismissible: false,
-                  );
+                  Get.dialog(const ExitDialog());
                 },
               ),
               // 점수 표시
