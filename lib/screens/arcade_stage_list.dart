@@ -22,7 +22,6 @@ class _ArcadeStageListScreenState extends State<ArcadeStageListScreen> {
     super.initState();
     _arcadeController = Get.find<ArcadeController>();
     _gameController = Get.find<ArcadeGameController>();
-    _arcadeController.refreshProgress();
   }
 
   @override
