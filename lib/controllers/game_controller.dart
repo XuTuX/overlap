@@ -365,14 +365,20 @@ class GameController extends GetxController {
   void gameover() {
     isGameOver.value = true;
     final newHighScore = score.value;
-    final stored = _hiveGameBox?.setHighScore(newHighScore) ?? false;
-    if (!stored) {
-      _fallbackHighScore = max(_fallbackHighScore, newHighScore);
-      _recordPersistenceFailure(
-        'Failed to persist high score',
-        StackTrace.current,
-      );
+    final currentBest = _readHighScore();
+    final hiveGameBox = _hiveGameBox;
+    final isNewPersonalBest = newHighScore > currentBest;
+
+    if (hiveGameBox != null && isNewPersonalBest) {
+      final stored = hiveGameBox.setHighScore(newHighScore);
+      if (!stored) {
+        _recordPersistenceFailure(
+          'Failed to persist high score',
+          StackTrace.current,
+        );
+      }
     }
+    _fallbackHighScore = max(_fallbackHighScore, newHighScore);
     _updateBestScore(newHighScore);
   }
 

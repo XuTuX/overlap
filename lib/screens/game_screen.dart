@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:overlap/constants/app_colors.dart';
@@ -85,9 +87,12 @@ class _GameScreenState extends State<GameScreen> {
               return const CountdownOverlay();
             }
 
+            final message = gameController.persistenceWarning.value;
+            final hasWarning = message != null;
+
             return Column(
               children: [
-                const SizedBox(height: 40),
+                SizedBox(height: math.min(metrics.cellHeight * 2, 40)),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -121,19 +126,18 @@ class _GameScreenState extends State<GameScreen> {
                     const SolveBoard(),
                   ],
                 ),
-                Obx(() {
-                  final message = gameController.persistenceWarning.value;
-                  if (message == null) {
-                    return const SizedBox.shrink();
-                  }
-                  return StorageWarningBanner(
+                if (message != null)
+                  StorageWarningBanner(
                     message: message,
                     onRetry: gameController.retryStorage,
-                  );
-                }),
-                SizedBox(height: metrics.cellHeight),
+                  ),
+                SizedBox(
+                  height: hasWarning
+                      ? math.min(metrics.cellHeight * 0.75, 16)
+                      : metrics.cellHeight,
+                ),
                 const GameBoard(),
-                SizedBox(height: metrics.cellHeight),
+                SizedBox(height: math.min(metrics.cellHeight, 24)),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Row(
@@ -160,7 +164,11 @@ class _GameScreenState extends State<GameScreen> {
                     ],
                   ),
                 ),
-                SizedBox(height: metrics.cellHeight * 2),
+                SizedBox(
+                  height: hasWarning
+                      ? math.min(metrics.cellHeight * 0.75, 16)
+                      : math.min(metrics.cellHeight * 1.5, 32),
+                ),
                 const GameDrag(),
               ],
             );
