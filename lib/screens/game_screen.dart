@@ -128,163 +128,186 @@ class _GameScreenState extends State<GameScreen> {
                                   hasWarning: hasWarning);
 
                               return Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  Expanded(
+                                  Flexible(
                                     flex: layoutFlex.header,
-                                    child: LayoutBuilder(
-                                      builder: (context, headerConstraints) {
-                                        return SingleChildScrollView(
-                                          physics:
-                                              const ClampingScrollPhysics(),
-                                          child: ConstrainedBox(
-                                            constraints: BoxConstraints(
-                                              minHeight:
-                                                  headerConstraints.maxHeight,
-                                            ),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
+                                    fit: FlexFit.loose,
+                                    child: Align(
+                                      alignment: Alignment.topCenter,
+                                      child: Padding(
+                                        padding: EdgeInsets.only(
+                                          top: metrics.scaledPadding(12),
+                                        ),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
                                               children: [
-                                                SizedBox(
-                                                  height:
-                                                      metrics.scaledPadding(12),
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  children: [
-                                                    Container(
-                                                      margin: EdgeInsets.all(
-                                                          metrics
-                                                              .scaledPadding(6)),
-                                                      padding: EdgeInsets.all(
-                                                          metrics
-                                                              .scaledPadding(6)),
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(24),
-                                                        color: AppColors.surface
-                                                            .withFraction(0.8),
-                                                        border: Border.all(
-                                                          color: Colors.white
-                                                              .withFraction(
-                                                                  0.04),
-                                                        ),
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color: Colors.black
-                                                                .withFraction(
-                                                                    0.25),
-                                                            blurRadius: 18 *
-                                                                metrics.scale,
-                                                            offset: Offset(
-                                                              0,
-                                                              6 * metrics.scale,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      child: Obx(() {
-                                                        return Column(
-                                                          children: [
-                                                            gameController
-                                                                    .isGameOver
-                                                                    .value
-                                                                ? const Gameover()
-                                                                : CircularTimer(),
-                                                          ],
-                                                        );
-                                                      }),
+                                                Container(
+                                                  margin: EdgeInsets.all(
+                                                    metrics.scaledPadding(6),
+                                                  ),
+                                                  padding: EdgeInsets.all(
+                                                    metrics.scaledPadding(6),
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                      24,
                                                     ),
-                                                    const SolveBoard(),
-                                                  ],
-                                                ),
-                                                if (message != null)
-                                                  StorageWarningBanner(
-                                                    message: message,
-                                                    onRetry: gameController
-                                                        .retryStorage,
+                                                    color: AppColors.surface
+                                                        .withFraction(0.8),
+                                                    border: Border.all(
+                                                      color: Colors.white
+                                                          .withFraction(0.04),
+                                                    ),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withFraction(0.25),
+                                                        blurRadius:
+                                                            18 * metrics.scale,
+                                                        offset: Offset(
+                                                          0,
+                                                          6 * metrics.scale,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                SizedBox(
-                                                  height: metrics
-                                                      .scaledPadding(
-                                                    hasWarning ? 10 : 16,
-                                                  ),
+                                                  child: Obx(() {
+                                                    return Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        gameController
+                                                                .isGameOver
+                                                                .value
+                                                            ? const Gameover()
+                                                            : CircularTimer(),
+                                                      ],
+                                                    );
+                                                  }),
                                                 ),
+                                                const SolveBoard(),
                                               ],
                                             ),
-                                          ),
-                                        );
-                                      },
+                                            if (message != null)
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                  top:
+                                                      metrics.scaledPadding(10),
+                                                ),
+                                                child: StorageWarningBanner(
+                                                  message: message,
+                                                  onRetry: gameController
+                                                      .retryStorage,
+                                                ),
+                                              ),
+                                            SizedBox(
+                                              height: metrics.scaledPadding(
+                                                hasWarning ? 10 : 16,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                  Expanded(
+                                  Flexible(
                                     flex: layoutFlex.board,
-                                    child: Center(
+                                    fit: FlexFit.loose,
+                                    child: Align(
+                                      alignment: Alignment.topCenter,
                                       child: const GameBoard(),
                                     ),
                                   ),
-                                  Expanded(
+                                  Flexible(
                                     flex: layoutFlex.rack,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        SizedBox(
-                                          height: metrics.boardToToolbarSpacing,
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 20.0,
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: Divider(
-                                                  thickness: math.max(
-                                                    1.5,
-                                                    3 * metrics.scale,
+                                    fit: FlexFit.loose,
+                                    child: LayoutBuilder(
+                                      builder:
+                                          (context, dragSectionConstraints) {
+                                        return Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
+                                          children: [
+                                            SizedBox(
+                                              height:
+                                                  metrics.boardToToolbarSpacing,
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 20.0,
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Divider(
+                                                      thickness: math.max(
+                                                        1.5,
+                                                        3 * metrics.scale,
+                                                      ),
+                                                      color: AppColors.divider,
+                                                    ),
                                                   ),
-                                                  color: AppColors.divider,
-                                                ),
-                                              ),
-                                              IconButton(
-                                                onPressed: gameController.undo,
-                                                icon: const Icon(
-                                                  Icons.restore_rounded,
-                                                  color:
-                                                      AppColors.textSecondary,
-                                                ),
-                                                iconSize: 24 * metrics.scale,
-                                              ),
-                                              Expanded(
-                                                child: Divider(
-                                                  thickness: math.max(
-                                                    1.5,
-                                                    3 * metrics.scale,
+                                                  IconButton(
+                                                    onPressed:
+                                                        gameController.undo,
+                                                    icon: const Icon(
+                                                      Icons.restore_rounded,
+                                                      color: AppColors
+                                                          .textSecondary,
+                                                    ),
+                                                    iconSize:
+                                                        24 * metrics.scale,
                                                   ),
-                                                  color: AppColors.divider,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Padding(
-                                            padding: EdgeInsets.only(
-                                              top: metrics.dragTopPadding(
-                                                hasWarning: hasWarning,
+                                                  Expanded(
+                                                    child: Divider(
+                                                      thickness: math.max(
+                                                        1.5,
+                                                        3 * metrics.scale,
+                                                      ),
+                                                      color: AppColors.divider,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
-                                            child: Align(
-                                              alignment: Alignment.topCenter,
-                                              child: const GameDrag(),
+                                            Expanded(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                  top: metrics.dragTopPadding(
+                                                    hasWarning: hasWarning,
+                                                  ),
+                                                ),
+                                                child: Align(
+                                                  alignment:
+                                                      Alignment.topCenter,
+                                                  child: ConstrainedBox(
+                                                    constraints: BoxConstraints(
+                                                      maxHeight: dragSectionConstraints
+                                                              .maxHeight
+                                                              .isFinite
+                                                          ? dragSectionConstraints
+                                                              .maxHeight
+                                                          : metrics.safeHeight *
+                                                              0.3,
+                                                    ),
+                                                    child: const GameDrag(),
+                                                  ),
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ),
-                                      ],
+                                          ],
+                                        );
+                                      },
                                     ),
                                   ),
                                 ],

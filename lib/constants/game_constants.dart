@@ -81,7 +81,6 @@ class GameConfig {
             maxWidthOverride > 0
         ? min(baseWidth, maxWidthOverride)
         : baseWidth;
-
     final double availableWidth = orientation == Orientation.landscape
         ? min(size.height, effectiveWidth)
         : effectiveWidth;
@@ -163,6 +162,10 @@ class GameConfig {
       metrics = metrics.scaled(widthScale);
     }
 
+    if (metrics.scale > 1.0) {
+      metrics = metrics.scaled(1.0 / metrics.scale);
+    }
+
     return metrics;
   }
 }
@@ -228,9 +231,8 @@ class GameLayoutMetrics {
     final double timerHeight = timerSize + scaledPadding(40);
     final double solveHeight = solveBoardSize;
     final double headerHeight = max(timerHeight, solveHeight);
-    final double spacingAfterHeader = hasWarning
-        ? scaledPadding(10)
-        : scaledPadding(16);
+    final double spacingAfterHeader =
+        hasWarning ? scaledPadding(10) : scaledPadding(16);
     final double warningSpacing = hasWarning ? scaledPadding(8) : 0.0;
     final double bannerHeight = hasWarning ? scaledPadding(72) : 0.0;
     final double boardHeight = boardSize * 1.1;
@@ -250,7 +252,7 @@ class GameLayoutMetrics {
         dragHeight;
   }
 
-  double scaledPadding(double value) => value * scale;
+  double scaledPadding(double value) => value * scale.clamp(0.75, 1.0);
 
   double get _boardToRackSpacingBase {
     final double relative = boardSize * GameConfig.boardToRackSpacingFactor;
@@ -315,9 +317,8 @@ class GameLayoutMetrics {
     final double topSpacing = scaledPadding(12);
     final double headerHeight =
         max(timerSize + scaledPadding(40), solveBoardSize);
-    final double spacingAfterHeader = hasWarning
-        ? scaledPadding(10)
-        : scaledPadding(16);
+    final double spacingAfterHeader =
+        hasWarning ? scaledPadding(10) : scaledPadding(16);
     final double warningSpacing = hasWarning ? scaledPadding(8) : 0.0;
     final double bannerHeight = hasWarning ? scaledPadding(72) : 0.0;
     return topSpacing +

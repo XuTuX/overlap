@@ -34,7 +34,7 @@ class GameDrag extends StatelessWidget {
           final double buttonPadding = metrics.scaledPadding(10);
           final double buttonSize =
               metrics.rotateIconSize + metrics.scaledPadding(16);
-          final double gap = metrics.scaledPadding(3);
+          final double controlSpacing = metrics.scaledPadding(18);
           final double bottomPadding = metrics.scaledPadding(8);
 
           final draggable = Draggable(
@@ -87,41 +87,35 @@ class GameDrag extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
+                  Column(
                     mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SizedBox(
                         width: metrics.blockBoxSize,
                         height: metrics.blockBoxSize,
                         child: draggable,
                       ),
-                      SizedBox(width: gap),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () => controller.rotateBlock(index),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  AppColors.surface.withFraction(0.92),
-                              shadowColor: AppColors.accent.withFraction(0.25),
-                              elevation: 8 * metrics.scale,
-                              shape: const CircleBorder(),
-                              padding: EdgeInsets.all(buttonPadding),
-                              minimumSize: Size.square(buttonSize),
-                            ),
-                            child: Image.asset(
-                              'assets/image/rotate.png',
-                              width: metrics.rotateIconSize,
-                              height: metrics.rotateIconSize,
-                              color: AppColors.accent,
-                            ),
-                          ),
-                          SizedBox(height: metrics.scaledPadding(2)),
-                          Text('회전', style: labelStyle),
-                        ],
+                      SizedBox(height: controlSpacing),
+                      ElevatedButton(
+                        onPressed: () => controller.rotateBlock(index),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              AppColors.surface.withFraction(0.92),
+                          shadowColor: AppColors.accent.withFraction(0.25),
+                          elevation: 8 * metrics.scale,
+                          shape: const CircleBorder(),
+                          padding: EdgeInsets.all(buttonPadding),
+                          minimumSize: Size.square(buttonSize),
+                        ),
+                        child: Image.asset(
+                          'assets/image/rotate.png',
+                          width: metrics.rotateIconSize,
+                          height: metrics.rotateIconSize,
+                          color: AppColors.accent,
+                        ),
                       ),
+                      SizedBox(height: metrics.scaledPadding(2)),
+                      Text('회전', style: labelStyle),
                     ],
                   ),
                   SizedBox(height: bottomPadding),

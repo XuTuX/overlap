@@ -11,8 +11,7 @@ class GameLayoutScope extends InheritedWidget {
   final GameLayoutMetrics metrics;
 
   static GameLayoutMetrics of(BuildContext context) {
-    final scope =
-        context.dependOnInheritedWidgetOfExactType<GameLayoutScope>();
+    final scope = context.dependOnInheritedWidgetOfExactType<GameLayoutScope>();
     if (scope != null) {
       return scope.metrics;
     }
