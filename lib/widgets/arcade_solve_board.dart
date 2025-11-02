@@ -36,7 +36,7 @@ class ArcadeSolveBoard extends StatelessWidget {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withFraction(0.35),
+                  color: AppColors.textPrimary.withFraction(0.18),
                   blurRadius: 16 * metrics.scale,
                   offset: Offset(0, 6 * metrics.scale),
                 ),
@@ -64,7 +64,7 @@ class ArcadeSolveBoard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(
                           math.max(6, 12 * metrics.scale)),
                       border: Border.all(
-                        color: Colors.white.withFraction(0.04),
+                        color: AppColors.textPrimary.withFraction(0.08),
                       ),
                       gradient: isOccupied
                           ? LinearGradient(
@@ -78,9 +78,9 @@ class ArcadeSolveBoard extends StatelessWidget {
                           : AppColors.surface.withFraction(0.85),
                       boxShadow: [
                         BoxShadow(
-                          color: isOccupied
-                              ? AppColors.accent.withFraction(0.3)
-                              : Colors.black.withFraction(0.2),
+                        color: isOccupied
+                            ? AppColors.accent.withFraction(0.3)
+                            : AppColors.textPrimary.withFraction(0.12),
                           blurRadius: 10 * metrics.scale,
                           offset: Offset(0, 3 * metrics.scale),
                         ),

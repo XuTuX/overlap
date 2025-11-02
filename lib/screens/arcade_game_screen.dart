@@ -35,7 +35,7 @@ class ArcadeGameScreen extends StatelessWidget {
                   onPressed: controller.restartStage,
                   icon: const Icon(
                     Icons.refresh_rounded,
-                    color: Colors.white,
+                    color: AppColors.textPrimary,
                   ),
                   iconSize: 24 * metrics.scale,
                 ),
@@ -211,11 +211,11 @@ class _StageStatsRow extends StatelessWidget {
                     BorderRadius.circular(math.max(12, 24 * metrics.scale)),
                 color: AppColors.surface.withFraction(0.82),
                 border: Border.all(
-                  color: Colors.white.withFraction(0.05),
+                  color: AppColors.textPrimary.withFraction(0.1),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withFraction(0.18),
+                    color: AppColors.textPrimary.withFraction(0.14),
                     blurRadius: 16 * metrics.scale,
                     offset: Offset(0, 6 * metrics.scale),
                   ),

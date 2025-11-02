@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:overlap/constants/app_colors.dart';
 import 'package:overlap/models/tetris_model.dart';
 import 'package:overlap/widgets/game_layout_scope.dart';
-
 import '../controllers/game_controller.dart';
 
 class GameDrag extends StatelessWidget {
@@ -13,17 +12,6 @@ class GameDrag extends StatelessWidget {
   Widget build(BuildContext context) {
     final GameController controller = Get.find<GameController>();
     final metrics = GameLayoutScope.of(context);
-    final TextStyle labelStyle =
-        Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.accent,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.4,
-                ) ??
-            TextStyle(
-              fontSize: metrics.rotateIconSize * 0.42,
-              color: AppColors.accent,
-              fontWeight: FontWeight.w600,
-            );
 
     return Obx(() {
       return Row(
@@ -31,53 +19,95 @@ class GameDrag extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: List.generate(controller.availableBlocks.length, (index) {
           final block = controller.availableBlocks[index];
-          final double buttonPadding = metrics.scaledPadding(10);
-          final double buttonSize =
-              metrics.rotateIconSize + metrics.scaledPadding(16);
-          final double controlSpacing = metrics.scaledPadding(18);
-          final double bottomPadding = metrics.scaledPadding(8);
 
-          final draggable = Draggable(
-            key: ValueKey('${block.name}-$index'),
-            feedback: TetrisModel(blockList: block.offsets),
-            childWhenDragging: SizedBox(
-              width: metrics.blockBoxSize,
-              height: metrics.blockBoxSize,
-            ),
-            child: Container(
-              width: metrics.blockBoxSize,
-              height: metrics.blockBoxSize,
-              padding: EdgeInsets.all(metrics.scaledPadding(2)),
-              child: TetrisModel(blockList: block.offsets),
-            ),
-            dragAnchorStrategy: (draggable, context, position) {
-              final offsetX = context.size!.width / 2;
-              final offsetY = context.size!.height + metrics.scaledPadding(27);
-              return Offset(offsetX, offsetY);
-            },
-            onDragEnd: (details) {
-              final renderObject =
-                  controller.gridKey.currentContext?.findRenderObject();
-              if (renderObject is! RenderBox) return;
-              final gridBox = renderObject;
-              final gridPosition = gridBox.localToGlobal(Offset.zero);
+          final draggable = Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              // --- 블록 자체 ---
+              Draggable(
+                key: ValueKey('${block.name}-$index'),
+                feedback: TetrisModel(blockList: block.offsets),
+                childWhenDragging: SizedBox(
+                  width: metrics.blockBoxSize,
+                  height: metrics.blockBoxSize,
+                ),
+                child: Container(
+                  width: metrics.blockBoxSize,
+                  height: metrics.blockBoxSize,
+                  padding: EdgeInsets.all(metrics.scaledPadding(2)),
+                  child: TetrisModel(blockList: block.offsets),
+                ),
+                dragAnchorStrategy: (draggable, context, position) {
+                  final offsetX = context.size!.width / 2;
+                  final offsetY =
+                      context.size!.height + metrics.scaledPadding(27);
+                  return Offset(offsetX, offsetY);
+                },
+                onDragEnd: (details) {
+                  final renderObject =
+                      controller.gridKey.currentContext?.findRenderObject();
+                  if (renderObject is! RenderBox) return;
+                  final gridBox = renderObject;
+                  final gridPosition = gridBox.localToGlobal(Offset.zero);
 
-              final dragPosition = details.offset;
+                  final dragPosition = details.offset;
 
-              final col = ((dragPosition.dx -
-                          gridPosition.dx +
-                          metrics.boardCellSize * 0.5) /
-                      metrics.boardCellSize)
-                  .floor();
+                  final col = ((dragPosition.dx -
+                              gridPosition.dx +
+                              metrics.boardCellSize * 0.5) /
+                          metrics.boardCellSize)
+                      .floor();
 
-              final row = ((dragPosition.dy -
-                          gridPosition.dy +
-                          metrics.boardCellSize * 0.5) /
-                      metrics.boardCellSize)
-                  .floor();
+                  final row = ((dragPosition.dy -
+                              gridPosition.dy +
+                              metrics.boardCellSize * 0.5) /
+                          metrics.boardCellSize)
+                      .floor();
 
-              controller.insert(block, col, row);
-            },
+                  controller.insert(block, col, row);
+                },
+              ),
+
+              // --- 회전 아이콘 (더 큰 터치 영역 + 살짝 더 우상단으로 이동) ---
+              Positioned(
+                top: -metrics.scaledPadding(20), // 기존보다 위로
+                right: -metrics.scaledPadding(14), // 기존보다 오른쪽으로
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () => controller.rotateBlock(index),
+                  child: Container(
+                    // 터치 가능한 영역을 더 넓힘 (1.7배)
+                    constraints: BoxConstraints(
+                      minWidth: metrics.rotateIconSize * 1.7,
+                      minHeight: metrics.rotateIconSize * 1.7,
+                    ),
+                    alignment: Alignment.center,
+                    child: Container(
+                      padding: EdgeInsets.all(metrics.scaledPadding(4)),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.transparent),
+                        color: AppColors.surface.withOpacity(0.9),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.accent.withOpacity(0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Image.asset(
+                        'assets/image/rotate.png',
+                        width: metrics.rotateIconSize * 0.6,
+                        height: metrics.rotateIconSize * 0.6,
+                        color: AppColors.accent,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           );
 
           return Expanded(
@@ -87,38 +117,11 @@ class GameDrag extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        width: metrics.blockBoxSize,
-                        height: metrics.blockBoxSize,
-                        child: draggable,
-                      ),
-                      SizedBox(height: controlSpacing),
-                      ElevatedButton(
-                        onPressed: () => controller.rotateBlock(index),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              AppColors.surface.withFraction(0.92),
-                          shadowColor: AppColors.accent.withFraction(0.25),
-                          elevation: 8 * metrics.scale,
-                          shape: const CircleBorder(),
-                          padding: EdgeInsets.all(buttonPadding),
-                          minimumSize: Size.square(buttonSize),
-                        ),
-                        child: Image.asset(
-                          'assets/image/rotate.png',
-                          width: metrics.rotateIconSize,
-                          height: metrics.rotateIconSize,
-                          color: AppColors.accent,
-                        ),
-                      ),
-                      SizedBox(height: metrics.scaledPadding(2)),
-                      Text('회전', style: labelStyle),
-                    ],
+                  SizedBox(
+                    width: metrics.blockBoxSize,
+                    height: metrics.blockBoxSize,
+                    child: draggable,
                   ),
-                  SizedBox(height: bottomPadding),
                 ],
               ),
             ),

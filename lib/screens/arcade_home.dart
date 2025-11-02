@@ -11,9 +11,17 @@ class ArcadeHomeScreen extends GetView<ArcadeController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Arcade Mode'),
+        title: const Text(
+          'Arcade Mode',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.4,
+          ),
+        ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
+        foregroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.home_rounded, color: Colors.white),
           onPressed: () {

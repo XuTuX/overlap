@@ -31,9 +31,16 @@ class _ArcadeStageListScreenState extends State<ArcadeStageListScreen> {
 
       return Scaffold(
         appBar: AppBar(
-          title: Text(chapter?.title ?? 'Arcade'),
+          title: Text(
+            chapter?.title ?? 'Arcade',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           backgroundColor: Colors.transparent,
           centerTitle: true,
+          foregroundColor: Colors.white,
         ),
         extendBodyBehindAppBar: true,
         body: Container(

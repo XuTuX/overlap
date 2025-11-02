@@ -74,7 +74,7 @@ class GameBoard extends StatelessWidget {
                       borderRadius:
                           BorderRadius.circular(math.max(6, 12 * metrics.scale)),
                       border: Border.all(
-                        color: Colors.white.withFraction(0.04),
+                        color: AppColors.textPrimary.withFraction(0.1),
                       ),
                       gradient: isOccupied
                           ? LinearGradient(
@@ -90,7 +90,7 @@ class GameBoard extends StatelessWidget {
                         BoxShadow(
                           color: isOccupied
                               ? AppColors.accent.withFraction(0.35)
-                              : Colors.black.withFraction(0.25),
+                              : AppColors.textPrimary.withFraction(0.12),
                           blurRadius: 12 * metrics.scale,
                           offset: Offset(0, 4 * metrics.scale),
                         )

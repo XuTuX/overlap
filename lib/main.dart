@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
         );
       },
       theme: ThemeData(
-        brightness: Brightness.dark,
+        brightness: Brightness.light,
         scaffoldBackgroundColor: AppColors.background,
         canvasColor: AppColors.surface,
         appBarTheme: AppBarTheme(
@@ -86,7 +86,7 @@ class MyApp extends StatelessWidget {
         dividerColor: AppColors.divider,
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColors.accent,
-          brightness: Brightness.dark,
+          brightness: Brightness.light,
           primary: AppColors.accent,
           secondary: AppColors.accentSecondary,
           tertiary: AppColors.accentTertiary,

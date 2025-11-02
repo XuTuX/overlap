@@ -35,7 +35,7 @@ class SolveBoard extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withFraction(0.35),
+                color: AppColors.textPrimary.withFraction(0.18),
                 blurRadius: 16 * metrics.scale,
                 offset: Offset(0, 6 * metrics.scale),
               ),
@@ -59,7 +59,8 @@ class SolveBoard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(
                             math.max(6, 12 * metrics.scale)),
                         border: Border.all(
-                          color: Colors.white.withFraction(0.04),
+                          color:
+                              AppColors.textPrimary.withFraction(0.08),
                         ),
                         gradient: solveController.solveList[index] ==
                                 BoardCellState.occupied
@@ -78,7 +79,8 @@ class SolveBoard extends StatelessWidget {
                             color: solveController.solveList[index] ==
                                     BoardCellState.occupied
                                 ? AppColors.accent.withFraction(0.3)
-                                : Colors.black.withFraction(0.2),
+                                : AppColors.textPrimary
+                                    .withFraction(0.12),
                             blurRadius: 10 * metrics.scale,
                             offset: Offset(0, 3 * metrics.scale),
                           ),

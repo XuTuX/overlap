@@ -47,7 +47,8 @@ class _GameScreenState extends State<GameScreen> {
               children: [
                 // 홈 버튼
                 IconButton(
-                  icon: const Icon(Icons.home_rounded, color: Colors.white),
+                  icon:
+                      const Icon(Icons.home_rounded, color: AppColors.textPrimary),
                   iconSize: 24 * metrics.scale,
                   onPressed: () {
                     if (gameController.isGameOver.value) {
@@ -153,13 +154,14 @@ class _GameScreenState extends State<GameScreen> {
                                                   color: AppColors.surface
                                                       .withFraction(0.8),
                                                   border: Border.all(
-                                                    color: Colors.white
-                                                        .withFraction(0.04),
+                                                    color: AppColors.textPrimary
+                                                        .withFraction(0.12),
                                                   ),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                      color: Colors.black
-                                                          .withFraction(0.25),
+                                                      color: AppColors
+                                                          .textPrimary
+                                                          .withFraction(0.14),
                                                       blurRadius:
                                                           18 * metrics.scale,
                                                       offset: Offset(
