@@ -46,8 +46,9 @@ class TetrisModel extends StatelessWidget {
                 left: gap + offsetX * (cellSize + gap),
                 top: gap + offsetY * (cellSize + gap),
                 child: Container(
-                  width: cellSize,
-                  height: cellSize,
+                  width: cellSize - 3,
+                  height: cellSize - 3,
+                  margin: EdgeInsets.all(3),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(
                       math.max(6, 12 * metrics.scale),
