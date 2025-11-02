@@ -34,7 +34,9 @@ class TetrisModel extends StatelessWidget {
       width: containerSide,
       height: containerSide,
       child: Center(
-        child: SizedBox(
+        child: Container(
+          decoration:
+              BoxDecoration(border: Border.all(color: Colors.transparent)),
           width: blockWidth,
           height: blockHeight,
           child: Stack(

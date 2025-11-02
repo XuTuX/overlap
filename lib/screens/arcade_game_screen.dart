@@ -6,6 +6,7 @@ import 'package:overlap/constants/app_colors.dart';
 import 'package:overlap/constants/game_constants.dart';
 import 'package:overlap/controllers/arcade_game_controller.dart';
 import 'package:overlap/models/stage_data.dart';
+import 'package:overlap/screens/arcade_stage_list.dart';
 import 'package:overlap/widgets/arcade_game_board.dart';
 import 'package:overlap/widgets/arcade_game_drag.dart';
 import 'package:overlap/widgets/arcade_solve_board.dart';
@@ -24,13 +25,38 @@ class ArcadeGameScreen extends StatelessWidget {
       metrics: metrics,
       child: Scaffold(
         appBar: AppBar(
-          title: Padding(
-            padding:
-                EdgeInsets.symmetric(horizontal: metrics.scaledPadding(20)),
-            child: Row(
+          automaticallyImplyLeading: false,
+          title: Obx(() {
+            final StageData? stage = controller.currentStage.value;
+            final String stageLabel =
+                stage != null ? 'Stage ${stage.order ?? stage.id}' : 'Arcade';
+
+            return Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                SizedBox(width: metrics.scaledPadding(10)),
+                IconButton(
+                    icon: const Icon(Icons.arrow_back,
+                        color: AppColors.textPrimary),
+                    iconSize: 24 * metrics.scale,
+                    onPressed: () =>
+                        Get.offAll(() => const ArcadeStageListScreen())),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        stageLabel,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 24 * metrics.scale,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 IconButton(
                   onPressed: controller.restartStage,
                   icon: const Icon(
@@ -40,8 +66,8 @@ class ArcadeGameScreen extends StatelessWidget {
                   iconSize: 24 * metrics.scale,
                 ),
               ],
-            ),
-          ),
+            );
+          }),
         ),
         body: Container(
           decoration: const BoxDecoration(
@@ -73,71 +99,110 @@ class ArcadeGameScreen extends StatelessWidget {
                         }
 
                         final metrics = GameLayoutScope.of(innerContext);
+                        final layoutFlex =
+                            metrics.flexDistribution(hasWarning: false);
 
                         return Stack(
                           children: [
                             Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                SizedBox(height: metrics.scaledPadding(24)),
-                                SizedBox(height: metrics.cellHeight),
-                                _StageStatsRow(stage: stage),
-                                SizedBox(height: metrics.cellHeight),
+                                Align(
+                                  alignment: Alignment.topCenter,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                      top: metrics.scaledPadding(12),
+                                    ),
+                                    child: _ArcadeHeader(stage: stage),
+                                  ),
+                                ),
                                 Flexible(
-                                  flex: 6,
-                                  child: Center(
+                                  flex: layoutFlex.board,
+                                  fit: FlexFit.loose,
+                                  child: Align(
+                                    alignment: Alignment.topCenter,
                                     child: const ArcadeGameBoard(),
                                   ),
                                 ),
-                                SizedBox(height: metrics.scaledPadding(16)),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: metrics.scaledPadding(20)),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Divider(
-                                          thickness:
-                                              math.max(1.5, 3 * metrics.scale),
-                                          color: AppColors.divider,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        onPressed: controller.undo,
-                                        icon: const Icon(
-                                          Icons.undo_rounded,
-                                          color: AppColors.textSecondary,
-                                        ),
-                                        iconSize: 24 * metrics.scale,
-                                      ),
-                                      IconButton(
-                                        onPressed: controller.restartStage,
-                                        icon: const Icon(
-                                          Icons.refresh_rounded,
-                                          color: AppColors.textSecondary,
-                                        ),
-                                        iconSize: 24 * metrics.scale,
-                                      ),
-                                      Expanded(
-                                        child: Divider(
-                                          thickness:
-                                              math.max(1.5, 3 * metrics.scale),
-                                          color: AppColors.divider,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: EdgeInsets.only(
-                                      top: metrics.cellHeight * 1.5,
-                                      bottom: metrics.cellHeight,
-                                    ),
-                                    child: Align(
-                                      alignment: Alignment.topCenter,
-                                      child: const ArcadeGameDrag(),
-                                    ),
+                                Flexible(
+                                  flex: layoutFlex.rack,
+                                  fit: FlexFit.loose,
+                                  child: LayoutBuilder(
+                                    builder: (context, dragSectionConstraints) {
+                                      return Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          SizedBox(
+                                            height:
+                                                metrics.boardToToolbarSpacing,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 20.0,
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Divider(
+                                                    thickness: math.max(
+                                                      1.5,
+                                                      3 * metrics.scale,
+                                                    ),
+                                                    color: AppColors.divider,
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  onPressed: controller.undo,
+                                                  icon: const Icon(
+                                                    Icons.restore_rounded,
+                                                    color:
+                                                        AppColors.textSecondary,
+                                                  ),
+                                                  iconSize: 24 * metrics.scale,
+                                                ),
+                                                Expanded(
+                                                  child: Divider(
+                                                    thickness: math.max(
+                                                      1.5,
+                                                      3 * metrics.scale,
+                                                    ),
+                                                    color: AppColors.divider,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Padding(
+                                              padding: EdgeInsets.only(
+                                                top: metrics.dragTopPadding(
+                                                  hasWarning: false,
+                                                ),
+                                                bottom:
+                                                    metrics.scaledPadding(18),
+                                              ),
+                                              child: Align(
+                                                alignment: Alignment.topCenter,
+                                                child: ConstrainedBox(
+                                                  constraints: BoxConstraints(
+                                                    maxHeight: dragSectionConstraints
+                                                            .maxHeight.isFinite
+                                                        ? dragSectionConstraints
+                                                            .maxHeight
+                                                        : metrics.safeHeight *
+                                                            0.3,
+                                                  ),
+                                                  child: const ArcadeGameDrag(),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
                                   ),
                                 ),
                               ],
@@ -186,6 +251,25 @@ class ArcadeGameScreen extends StatelessWidget {
   }
 }
 
+class _ArcadeHeader extends StatelessWidget {
+  const _ArcadeHeader({required this.stage});
+
+  final StageData stage;
+
+  @override
+  Widget build(BuildContext context) {
+    final metrics = GameLayoutScope.of(context);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(height: metrics.scaledPadding(10)),
+        _StageStatsRow(stage: stage),
+      ],
+    );
+  }
+}
+
 class _StageStatsRow extends StatelessWidget {
   final StageData stage;
 
@@ -196,8 +280,7 @@ class _StageStatsRow extends StatelessWidget {
     final ArcadeGameController controller = Get.find<ArcadeGameController>();
     final metrics = GameLayoutScope.of(context);
     return Padding(
-      padding:
-          EdgeInsets.symmetric(horizontal: metrics.scaledPadding(30)),
+      padding: EdgeInsets.symmetric(horizontal: metrics.scaledPadding(30)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.start,

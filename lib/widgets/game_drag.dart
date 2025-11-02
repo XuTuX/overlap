@@ -33,8 +33,10 @@ class GameDrag extends StatelessWidget {
                   height: metrics.blockBoxSize,
                 ),
                 child: Container(
-                  width: metrics.blockBoxSize,
-                  height: metrics.blockBoxSize,
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.transparent)),
+                  width: metrics.blockBoxSize - 1,
+                  height: metrics.blockBoxSize - 1,
                   padding: EdgeInsets.all(metrics.scaledPadding(2)),
                   child: TetrisModel(blockList: block.offsets),
                 ),
@@ -55,13 +57,13 @@ class GameDrag extends StatelessWidget {
 
                   final col = ((dragPosition.dx -
                               gridPosition.dx +
-                              metrics.boardCellSize * 0.5) /
+                              metrics.boardCellSize * 0.6) /
                           metrics.boardCellSize)
                       .floor();
 
                   final row = ((dragPosition.dy -
                               gridPosition.dy +
-                              metrics.boardCellSize * 0.5) /
+                              metrics.boardCellSize * 0.6) /
                           metrics.boardCellSize)
                       .floor();
 
