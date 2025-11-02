@@ -131,89 +131,83 @@ class _GameScreenState extends State<GameScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  Flexible(
-                                    flex: layoutFlex.header,
-                                    fit: FlexFit.loose,
-                                    child: Align(
-                                      alignment: Alignment.topCenter,
-                                      child: Padding(
-                                        padding: EdgeInsets.only(
-                                          top: metrics.scaledPadding(12),
-                                        ),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                Container(
-                                                  margin: EdgeInsets.all(
-                                                    metrics.scaledPadding(6),
+                                  Align(
+                                    alignment: Alignment.topCenter,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        top: metrics.scaledPadding(12),
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Container(
+                                                margin: EdgeInsets.all(
+                                                  metrics.scaledPadding(6),
+                                                ),
+                                                padding: EdgeInsets.all(
+                                                  metrics.scaledPadding(6),
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                    24,
                                                   ),
-                                                  padding: EdgeInsets.all(
-                                                    metrics.scaledPadding(6),
+                                                  color: AppColors.surface
+                                                      .withFraction(0.8),
+                                                  border: Border.all(
+                                                    color: Colors.white
+                                                        .withFraction(0.04),
                                                   ),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                      24,
-                                                    ),
-                                                    color: AppColors.surface
-                                                        .withFraction(0.8),
-                                                    border: Border.all(
-                                                      color: Colors.white
-                                                          .withFraction(0.04),
-                                                    ),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors.black
-                                                            .withFraction(0.25),
-                                                        blurRadius:
-                                                            18 * metrics.scale,
-                                                        offset: Offset(
-                                                          0,
-                                                          6 * metrics.scale,
-                                                        ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black
+                                                          .withFraction(0.25),
+                                                      blurRadius:
+                                                          18 * metrics.scale,
+                                                      offset: Offset(
+                                                        0,
+                                                        6 * metrics.scale,
                                                       ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Obx(() {
+                                                  return Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      gameController
+                                                              .isGameOver.value
+                                                          ? const Gameover()
+                                                          : CircularTimer(),
                                                     ],
-                                                  ),
-                                                  child: Obx(() {
-                                                    return Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        gameController
-                                                                .isGameOver
-                                                                .value
-                                                            ? const Gameover()
-                                                            : CircularTimer(),
-                                                      ],
-                                                    );
-                                                  }),
-                                                ),
-                                                const SolveBoard(),
-                                              ],
-                                            ),
-                                            if (message != null)
-                                              Padding(
-                                                padding: EdgeInsets.only(
-                                                  top:
-                                                      metrics.scaledPadding(10),
-                                                ),
-                                                child: StorageWarningBanner(
-                                                  message: message,
-                                                  onRetry: gameController
-                                                      .retryStorage,
-                                                ),
+                                                  );
+                                                }),
                                               ),
-                                            SizedBox(
-                                              height: metrics.scaledPadding(
-                                                hasWarning ? 10 : 16,
+                                              const SolveBoard(),
+                                            ],
+                                          ),
+                                          if (message != null)
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                top: metrics.scaledPadding(10),
+                                              ),
+                                              child: StorageWarningBanner(
+                                                message: message,
+                                                onRetry:
+                                                    gameController.retryStorage,
                                               ),
                                             ),
-                                          ],
-                                        ),
+                                          SizedBox(
+                                            height: metrics.scaledPadding(
+                                              hasWarning ? 10 : 16,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),

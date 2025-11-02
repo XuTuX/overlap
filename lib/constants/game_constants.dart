@@ -11,8 +11,8 @@ class GameConfig {
   static const double blockPivot = 1.0;
   static const int availableBlockCount = 2;
   static const Duration countdownDelay = Duration(seconds: 2);
-  static const double boardToRackSpacingFactor = 0.04;
-  static const double boardToRackWarningFactor = 0.65;
+  static const double boardHeightSafeFractionPhone = 0.45;
+  static const double boardHeightSafeFractionTablet = 0.52;
 
   static const Map<String, List<Offset>> blockShapes = {
     'O': [
@@ -81,33 +81,6 @@ class GameConfig {
             maxWidthOverride > 0
         ? min(baseWidth, maxWidthOverride)
         : baseWidth;
-    final double availableWidth = orientation == Orientation.landscape
-        ? min(size.height, effectiveWidth)
-        : effectiveWidth;
-    final double fallbackWidth = min(effectiveWidth, size.height);
-    final double widthForLayout = max(availableWidth, fallbackWidth);
-
-    final double maxBoardSize =
-        max(min(widthForLayout, effectiveWidth) - 32, 200);
-    final double boardCandidate =
-        (isTablet ? effectiveWidth * 0.35 : effectiveWidth * 0.5)
-            .clamp(180, maxBoardSize)
-            .toDouble();
-    final double boardSize = min(boardCandidate, maxBoardSize);
-
-    final double solveCandidate =
-        (isTablet ? effectiveWidth * 0.19 : effectiveWidth * 0.28)
-            .clamp(140.0, boardSize * 0.8)
-            .toDouble();
-    final double timerCandidate =
-        (isTablet ? effectiveWidth * 0.15 : effectiveWidth * 0.25)
-            .clamp(120.0, boardSize)
-            .toDouble();
-    final double cellHeight =
-        (isTablet ? size.height * 0.02 : size.height * 0.01)
-            .clamp(12.0, 32.0)
-            .toDouble();
-
     double safeHeight = max(
       0.0,
       size.height - padding.vertical - viewInsets.vertical - appBarHeight,
@@ -118,14 +91,44 @@ class GameConfig {
       safeHeight = min(safeHeight, maxHeightOverride);
     }
 
+    final double availableWidth = orientation == Orientation.landscape
+        ? min(size.height, effectiveWidth)
+        : effectiveWidth;
+    final double fallbackWidth = min(effectiveWidth, size.height);
+    final double widthForLayout = max(availableWidth, fallbackWidth);
+
+    final double maxBoardWidth =
+        max(min(widthForLayout, effectiveWidth) - 32, 160);
+
+    final double boardHeightFraction =
+        isTablet ? boardHeightSafeFractionTablet : boardHeightSafeFractionPhone;
+    double boardSize = maxBoardWidth;
+    if (safeHeight.isFinite && safeHeight > 0) {
+      final double boardByHeight = (safeHeight * boardHeightFraction) / 1.1;
+      if (boardByHeight > 0) {
+        boardSize = min(boardSize, boardByHeight);
+      }
+    }
+    boardSize = boardSize.clamp(160.0, maxBoardWidth);
+
+    double solveSize = (isTablet ? boardSize * 0.65 : boardSize * 0.78)
+        .clamp(120.0, boardSize * 0.85);
+    double timerSize = (isTablet ? boardSize * 0.58 : boardSize * 0.72)
+        .clamp(110.0, boardSize);
+
+    final double cellHeight =
+        (isTablet ? size.height * 0.02 : size.height * 0.01)
+            .clamp(12.0, 32.0)
+            .toDouble();
+
     GameLayoutMetrics metrics = GameLayoutMetrics(
       screenSize: Size(effectiveWidth, size.height),
       safeHeight: safeHeight,
       isTablet: isTablet,
       boardSize: boardSize,
-      solveBoardSize: solveCandidate,
+      solveBoardSize: solveSize,
       cellHeight: cellHeight,
-      timerSize: timerCandidate,
+      timerSize: timerSize,
       scale: 1.0,
     );
 
@@ -200,16 +203,11 @@ class GameLayoutMetrics {
   double get gameOverTextSize => (isTablet ? 45 : 32) * scale;
   double get gameOverIconSize => (isTablet ? 45 : 32) * scale;
   double get rotateIconSize => (isTablet ? 36 : 24) * scale;
-  double get boardToToolbarSpacing =>
-      max(_boardToRackSpacingBase * 0.3, 4.0 * scale);
+  double get boardToToolbarSpacing => 16.0 * spacingScale;
 
   double dragTopPadding({required bool hasWarning}) {
-    final double base = _boardToRackSpacingBase * 0.75;
-    if (!hasWarning) {
-      return max(base, 6.0 * scale);
-    }
-    final double reduced = base * GameConfig.boardToRackWarningFactor;
-    return max(reduced, 6.0 * scale);
+    final double base = hasWarning ? 12.0 : 16.0;
+    return max(base * spacingScale, 6.0);
   }
 
   GameLayoutMetrics scaled(double factor) {
@@ -252,14 +250,9 @@ class GameLayoutMetrics {
         dragHeight;
   }
 
-  double scaledPadding(double value) => value * scale.clamp(0.75, 1.0);
+  double scaledPadding(double value) => value * spacingScale;
 
-  double get _boardToRackSpacingBase {
-    final double relative = boardSize * GameConfig.boardToRackSpacingFactor;
-    final double minSpacing = 10.0 * scale;
-    final double maxSpacing = (isTablet ? 40.0 : 28.0) * scale;
-    return relative.clamp(minSpacing, maxSpacing).toDouble();
-  }
+  double get spacingScale => scale.clamp(0.85, 1.0);
 
   GameLayoutFlex flexDistribution({required bool hasWarning}) {
     final double header = _headerSectionFootprint(hasWarning: hasWarning);
