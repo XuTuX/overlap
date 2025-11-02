@@ -33,6 +33,12 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   @override
+  void dispose() {
+    gameController.stopAllTimers();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final metrics = GameConfig.layoutOf(context);
     return GameLayoutScope(
@@ -47,8 +53,8 @@ class _GameScreenState extends State<GameScreen> {
               children: [
                 // 홈 버튼
                 IconButton(
-                  icon:
-                      const Icon(Icons.home_rounded, color: AppColors.textPrimary),
+                  icon: const Icon(Icons.home_rounded,
+                      color: AppColors.textPrimary),
                   iconSize: 24 * metrics.scale,
                   onPressed: () {
                     if (gameController.isGameOver.value) {

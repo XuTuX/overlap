@@ -10,7 +10,7 @@ import 'package:overlap/enums/board_cell_state.dart';
 import 'package:overlap/models/game_state.dart';
 import 'package:overlap/models/hive_game_box.dart';
 
-class GameController extends GetxController {
+class GameController extends GetxController with WidgetsBindingObserver {
   GameController({HiveGameBox? hiveGameBox, TimerController? timerController})
       : timerController = timerController ?? Get.put(TimerController()) {
     _assignHiveBox(hiveGameBox);
@@ -48,6 +48,11 @@ class GameController extends GetxController {
   final RxBool isCountdownDone = false.obs;
 
   final RxBool shakeBoard = false.obs;
+
+  Timer? _countdownTimer;
+  Timer? _glowResetTimer;
+  Timer? _shakeResetTimer;
+  Timer? _undoRevertTimer;
 
   void _assignHiveBox(HiveGameBox? hiveGameBox) {
     _hiveGameBox =
@@ -117,18 +122,32 @@ class GameController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     applyNextBlockOverlay();
     bestScore.value = _readHighScore();
   }
 
-  void startCountdown() async {
-    await Future.delayed(GameConfig.countdownDelay);
-    isCountdownDone.value = true;
+  @override
+  void onClose() {
+    stopAllTimers();
+    WidgetsBinding.instance.removeObserver(this);
+    super.onClose();
+  }
+
+  void startCountdown() {
+    _countdownTimer?.cancel();
+    _countdownTimer = Timer(GameConfig.countdownDelay, () {
+      if (isClosed) return;
+      isCountdownDone.value = true;
+    });
   }
 
   void triggerBoardGlow() {
+    if (isClosed) return;
     glowBoard.value = true;
-    Future.delayed(const Duration(milliseconds: 500), () {
+    _glowResetTimer?.cancel();
+    _glowResetTimer = Timer(const Duration(milliseconds: 500), () {
+      if (isClosed) return;
       glowBoard.value = false;
     });
   }
@@ -345,6 +364,7 @@ class GameController extends GetxController {
   }
 
   void resetGame() {
+    _cancelAllTimers();
     isGameOver.value = false;
     isCountdownDone.value = false;
     resetBoard();
@@ -404,7 +424,9 @@ class GameController extends GetxController {
       } else {
         debugPrint("모든 블록을 놓았지만 정답이 아닙니다.");
         triggerBoardShake();
-        Future.delayed(const Duration(milliseconds: 200), () {
+        _undoRevertTimer?.cancel();
+        _undoRevertTimer = Timer(const Duration(milliseconds: 200), () {
+          if (isClosed) return;
           undo();
         });
       }
@@ -412,10 +434,41 @@ class GameController extends GetxController {
   }
 
   void triggerBoardShake() {
+    if (isClosed) return;
     shakeBoard.value = true;
 
-    Future.delayed(const Duration(milliseconds: 500), () {
+    _shakeResetTimer?.cancel();
+    _shakeResetTimer = Timer(const Duration(milliseconds: 500), () {
+      if (isClosed) return;
       shakeBoard.value = false;
     });
+  }
+
+  void stopAllTimers() {
+    timerController.pauseTimer();
+    _cancelAllTimers();
+  }
+
+  void _cancelAllTimers() {
+    _countdownTimer?.cancel();
+    _countdownTimer = null;
+    _glowResetTimer?.cancel();
+    _glowResetTimer = null;
+    _shakeResetTimer?.cancel();
+    _shakeResetTimer = null;
+    _undoRevertTimer?.cancel();
+    _undoRevertTimer = null;
+    if (!isClosed) {
+      glowBoard.value = false;
+      shakeBoard.value = false;
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      stopAllTimers();
+    }
   }
 }

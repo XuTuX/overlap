@@ -21,7 +21,7 @@ class TetrisModel extends StatelessWidget {
     final int widthCells = (maxX - minX).abs().toInt() + 1;
     final int heightCells = (maxY - minY).abs().toInt() + 1;
 
-    final double rawCellSize = metrics.boardCellSize - gap * 2;
+    final double rawCellSize = metrics.boardCellSize - 2 - gap * 2;
     final double cellSize = math.max(6.0, rawCellSize);
 
     final double blockWidth = widthCells * (cellSize + gap) + gap;
