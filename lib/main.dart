@@ -15,6 +15,7 @@ import 'package:overlap/screens/game_screen.dart';
 import 'package:overlap/screens/home_screen.dart';
 import 'package:overlap/screens/login_screen.dart';
 import 'package:overlap/screens/tutorial_screen.dart';
+import 'package:overlap/widgets/fixed_aspect_ratio_viewport.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,6 +55,15 @@ class MyApp extends StatelessWidget {
       title: 'overlap',
       transitionDuration: const Duration(milliseconds: 300),
       defaultTransition: Transition.rightToLeft,
+      builder: (context, child) {
+        if (child == null) {
+          return const SizedBox.shrink();
+        }
+        return FixedAspectRatioViewport(
+          aspectRatio: 9 / 16,
+          child: child,
+        );
+      },
       theme: ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: AppColors.background,

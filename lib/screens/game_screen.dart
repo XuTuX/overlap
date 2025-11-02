@@ -145,12 +145,6 @@ class _GameScreenState extends State<GameScreen> {
                                                 MainAxisAlignment.spaceEvenly,
                                             children: [
                                               Container(
-                                                margin: EdgeInsets.all(
-                                                  metrics.scaledPadding(6),
-                                                ),
-                                                padding: EdgeInsets.all(
-                                                  metrics.scaledPadding(6),
-                                                ),
                                                 decoration: BoxDecoration(
                                                   borderRadius:
                                                       BorderRadius.circular(
@@ -202,11 +196,6 @@ class _GameScreenState extends State<GameScreen> {
                                                     gameController.retryStorage,
                                               ),
                                             ),
-                                          SizedBox(
-                                            height: metrics.scaledPadding(
-                                              hasWarning ? 10 : 16,
-                                            ),
-                                          ),
                                         ],
                                       ),
                                     ),
@@ -280,6 +269,8 @@ class _GameScreenState extends State<GameScreen> {
                                                   top: metrics.dragTopPadding(
                                                     hasWarning: hasWarning,
                                                   ),
+                                                  bottom:
+                                                      metrics.scaledPadding(18),
                                                 ),
                                                 child: Align(
                                                   alignment:

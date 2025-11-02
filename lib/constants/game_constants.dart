@@ -11,8 +11,8 @@ class GameConfig {
   static const double blockPivot = 1.0;
   static const int availableBlockCount = 2;
   static const Duration countdownDelay = Duration(seconds: 2);
-  static const double boardHeightSafeFractionPhone = 0.45;
-  static const double boardHeightSafeFractionTablet = 0.52;
+  static const double boardHeightSafeFractionPhone = 0.28;
+  static const double boardHeightSafeFractionTablet = 0.3;
 
   static const Map<String, List<Offset>> blockShapes = {
     'O': [
@@ -111,10 +111,8 @@ class GameConfig {
     }
     boardSize = boardSize.clamp(160.0, maxBoardWidth);
 
-    double solveSize = (isTablet ? boardSize * 0.65 : boardSize * 0.78)
-        .clamp(120.0, boardSize * 0.85);
-    double timerSize = (isTablet ? boardSize * 0.58 : boardSize * 0.72)
-        .clamp(110.0, boardSize);
+    double solveSize = (boardSize * 0.55).clamp(80.0, boardSize * 0.88);
+    double timerSize = (boardSize * 0.45).clamp(70.0, boardSize * 0.8);
 
     final double cellHeight =
         (isTablet ? size.height * 0.02 : size.height * 0.01)
@@ -203,7 +201,7 @@ class GameLayoutMetrics {
   double get gameOverTextSize => (isTablet ? 45 : 32) * scale;
   double get gameOverIconSize => (isTablet ? 45 : 32) * scale;
   double get rotateIconSize => (isTablet ? 36 : 24) * scale;
-  double get boardToToolbarSpacing => 16.0 * spacingScale;
+  double get boardToToolbarSpacing => 10.0 * spacingScale;
 
   double dragTopPadding({required bool hasWarning}) {
     final double base = hasWarning ? 12.0 : 16.0;
@@ -230,7 +228,8 @@ class GameLayoutMetrics {
     final double solveHeight = solveBoardSize;
     final double headerHeight = max(timerHeight, solveHeight);
     final double spacingAfterHeader =
-        hasWarning ? scaledPadding(10) : scaledPadding(16);
+        hasWarning ? scaledPadding(4) : scaledPadding(8);
+
     final double warningSpacing = hasWarning ? scaledPadding(8) : 0.0;
     final double bannerHeight = hasWarning ? scaledPadding(72) : 0.0;
     final double boardHeight = boardSize * 1.1;
@@ -330,7 +329,7 @@ class GameLayoutMetrics {
     final double dragHeight =
         blockBoxSize + scaledPadding(12) + rotateIconSize + scaledPadding(24);
     final double topPadding = dragTopPadding(hasWarning: hasWarning);
-    return topPadding + dividerHeight + dragHeight;
+    return topPadding + dividerHeight + dragHeight + scaledPadding(12);
   }
 
   GameLayoutMetrics ensureFitsHeight(
